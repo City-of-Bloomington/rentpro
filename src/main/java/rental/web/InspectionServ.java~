@@ -1,0 +1,866 @@
+package rental.web;
+
+import java.util.*;
+import java.util.regex.*;
+import java.sql.*;
+import java.io.*;
+import javax.servlet.*;
+import javax.servlet.http.*;
+import javax.servlet.annotation.WebServlet;
+import javax.sql.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import rental.list.*;
+import rental.model.*;
+import rental.utils.*;
+
+@WebServlet(urlPatterns = {"/InspectionServ"})
+public class InspectionServ extends TopServlet{
+
+    final static long serialVersionUID = 470L;
+    static Logger logger = LogManager.getLogger(InspectionServ.class);
+
+    //
+    List<Inspector> inspectors = null;
+    List<Item> inspectTypes = null;
+
+    static final String allHeatSrc = "<option>\n" + 
+	"<option>Gas"+
+	"<option>Electric"+
+	"<option>Other"+
+	"</select>";
+	
+    static final String foundArr[] = {"",
+	"Basement",
+	"Slab",
+	"Crawl Space",
+	"Celat",
+	"Other"};
+
+    static final String atticArr[] = {"",
+	"Yes",
+	"No",
+	"N/A"};
+    static final String affidavitArr[] = {"",
+	"Yes",
+	"No",
+	"N/A"};		
+    /**
+     * Generates the inspection main form with the view of
+     * previously entered information.
+     *
+     * @param req
+     * @param res
+     * @throws ServletException
+     * @throws IOException
+     */
+    public void doGet(HttpServletRequest req, 
+		      HttpServletResponse res) 
+	throws ServletException, IOException {
+	doPost(req,res);
+    }
+    /**
+     * @link #doGet
+     * @see #doGet
+     */
+    public void doPost(HttpServletRequest req, 
+		       HttpServletResponse res) 
+	throws ServletException, IOException {
+    
+	res.setContentType("text/html");
+	PrintWriter out = res.getWriter();
+	String name, value;
+	String saveDirectory = "C:/temp",inspection_date2="";
+
+	String action="";
+
+	String id="", rental_id="",
+	    insp_file="", inspection_date="",
+	    variance="", dyy="", dmm="", report="";
+	// 
+	// the threshold date where the inspection files started being
+	// classed in year/month subdirectories, while all the old files
+	// will stay in the same original directory
+	//
+	String thresholdDate = "2003/10/06";
+	boolean success = true;
+	String checkMessage = "", message="";
+	String fileAndPath = "";
+	// 
+	// for inspection report
+	String insp_id="";
+
+	String [] vals;
+	Hashtable<String, String> inspMap = new Hashtable<String, String>();
+	//
+	// class to handle multipart request (for example text + image)
+	// the image file or any upload file will be saved to the 
+	// specified directory
+	// 
+	Enumeration<String> values = req.getParameterNames();
+	Inspection inspect = new Inspection(debug);
+	while (values.hasMoreElements()){
+	    name = values.nextElement().trim();
+	    vals = req.getParameterValues(name);
+	    if(vals == null) continue;
+	    value = vals[vals.length-1].trim();	
+	    if (name.equals("id")){
+		id = value;
+		// inspect.setRegistrId(id);
+		inspect.setId(id);								
+	    }
+	    else if (name.equals("insp_id")){
+		/*
+		  insp_id = value;
+		*/
+		id = value;
+		inspect.setId(id);
+	    }
+	    else if (name.equals("rental_id")){
+		rental_id = value;
+		inspect.setRegistrId(rental_id);
+	    }						
+	    else if (name.equals("inspection_date")){
+		inspect.setInspectionDate(value);
+	    }
+	    else if (name.equals("inspection_type")) {
+		inspect.setInspectionType(value);
+	    }
+	    else if (name.equals("inspected_by")) {
+		inspect.setInspectedBy(value);
+	    }
+	    else if (name.equals("has_affidavit")) {
+		inspect.setHasAffidavit(value);
+	    }						
+	    else if (name.equals("compliance_date")) {
+		inspect.setComplianceDate(value);
+	    }
+	    else if (name.equals("heat_src")){
+		inspect.setHeatSrc(value);
+	    }
+	    else if (name.equals("foundation")){
+		inspect.setFoundation(value);
+	    }
+	    else if (name.equals("attic")){
+		inspect.setAttic(value);
+	    }
+	    else if (name.equals("accessory")){
+		inspect.setAccessory(value);
+	    }
+	    else if (name.equals("story_cnt")){
+		inspect.setStoryCnt(value);
+	    }
+	    else if (name.equals("violations")){
+		try{
+		    int iv = Integer.parseInt(value);
+		    inspect.setViolations(value.trim());
+		}
+		catch(Exception ex){} // just ingnore if not a number
+	    }
+	    else if (name.equals("smook_detectors")){
+		try{
+		    int n = Integer.parseInt(value);
+		    inspect.setSmookDetectors(value.trim());
+		}
+		catch(Exception ex){} // just ingnore if not a number
+	    }
+	    else if (name.equals("life_safety")){
+		try{
+		    int iv = Integer.parseInt(value);
+		    inspect.setLifeSafety(value.trim());
+		}
+		catch(Exception ex){} // just ingnore if not a number
+	    }			
+	    else if (name.equals("comments")){
+		inspect.setComments(value);
+	    }
+	    else if (name.equals("time_spent")){
+		inspect.setTimeSpent(value);
+	    }
+	    else if(name.equals("action")){
+		if(value.equals("New")) action = "";
+		else action = value;  
+	    }
+	    else if(name.equals("action2")){
+		if(!value.equals(""))
+		    action = value;
+	    }
+	}
+	User user = null;
+	HttpSession session = null;
+	session = req.getSession(false);
+	if(session != null){
+	    user = (User)session.getAttribute("user");
+	    if(user == null){
+		String str = url+"Login?source=InspectionServ&id="+id;
+		res.sendRedirect(str);
+		return; 
+	    }
+	}
+	else{
+	    String str = url+"Login?source=InspectionServ&id="+id;
+	    res.sendRedirect(str);
+	    return; 
+	}
+	if(action.equals("zoom")){
+	    String str = url+"InspectFileServ?insp_id="+insp_id;
+	    res.sendRedirect(str);
+	    return; 
+	}
+	Rent rent = new Rent(rental_id, debug);
+	if(true){
+	    String back = rent.doSelect();
+	    if(!back.equals("")){
+		message += " could not retrieve rental data "+back;
+		success = false;
+	    }
+	}
+	File file = null;
+	if(true){
+	    String str="",str2="";
+	    if(inspectors == null){
+		InspectorList il = new InspectorList(debug);
+		str = il.find();
+		if(str.equals("")){
+		    inspectors = il.getInspectors();
+		}
+	    }
+	    if(inspectTypes == null){
+		InspectTypeList itl = new InspectTypeList(debug);
+		str = itl.find();
+		if(str.equals("")){
+		    inspectTypes = itl.getInspectTypes();
+		}
+	    }
+	}
+	if(inspectTypes != null){
+	    for(Item item: inspectTypes){
+		inspMap.put(item.getId(),item.getName());
+	    }
+	}
+	//        
+	if(!id.equals("")){
+	    //
+	    String back = inspect.doSelect();
+	    if(!back.equals("")){
+		message += " could not retrieve inspection data "+back;
+		success = false;
+	    }
+	    insp_file = inspect.getInspFile();
+	    if(insp_file != null && !insp_file.equals("")){
+		String str = Helper.getFileDir(insp_file);
+		if(str != null){
+		    fileAndPath = pc_path+str+insp_file;
+		    // fileAndPath = server_path+str+insp_file;
+		}
+		else{
+		    fileAndPath = pc_path+insp_file;										
+		    // fileAndPath = server_path+insp_file;
+		}
+	    }
+	}
+	else if(action.startsWith("Save")){
+	    //
+	    String back = "";
+	    if(user.canEdit() || user.isInspector()){
+		String inspected_by = inspect.getInspectedBy();
+		if(inspected_by == null || inspected_by.isEmpty()){
+		    message = "Inspected by is required";
+		    success = false;
+		}
+		else{
+		    inspection_date = inspect.getInspectionDate();
+		    if(inspection_date != null && !inspection_date.equals("")){
+			dmm = inspection_date.substring(0,2);  // nonth
+			dyy = inspection_date.substring(6,10); // year
+			insp_file = inspect.createFileName();
+			insp_file =  dyy+"/"+dmm+"/"+insp_file;										
+		    }
+		    back = inspect.doSave();
+		    if(!back.equals("")){
+			message += " Error saving data "+back;
+			success = false;
+		    }
+		    else{
+			id = inspect.getId(); //insp_id
+		    }
+		}
+		//
+		// if this is a cycle inspection, update the recycle date
+		// in the main registration record
+		//
+		if(success){
+		    if(inspect.getInspectionType().equals("CYCL")){
+			rent.setLast_cycle_date(inspect.getInspectionDate());
+			back = rent.doUpdate();
+			if(!back.equals("")){
+			    message += " Could not update rental "+back;
+			    success = false;
+			}	
+		    }
+		}
+		// generate the inspection file
+		//
+		// get the owner and agent addresses
+		//
+		if(success){
+		    List<Owner> owners = rent.getOwners();
+		    Owner agent = rent.getAgent();
+		    List<Variance> variances = rent.getVariances();
+		    if(variances != null){
+			for(Variance var:variances){
+			    variance += var.getDate()+" "+var.getText()+"\n";
+			}
+		    }
+		    List<Address> addresses = rent.getAddresses();
+		    //
+		    // if this is a new file 
+		    // write to file
+		    //
+		    String b24 = "\t\t\t", b4="    ";
+		    String str="", str2="", propAddr="";
+		    file = null;
+		    file = new File(server_path+dyy+"/"+dmm);
+		    fileAndPath = server_path + Helper.replaceSlash(insp_file);
+		    logger.debug(" Save file 2 "+fileAndPath);
+		    if(!file.exists()){
+			file.mkdirs(); // create the directories
+			//  set the access for the directory
+			// check if we are on the server
+			File file2 = new File("/bin/chgrp");
+			//
+			if(file2.exists()){ // on the server
+			    String cmd = "/bin/chgrp hand "+server_path+dyy;
+			    String cmd2 = "/bin/chmod 777 "+server_path+dyy;
+			    Runtime.getRuntime().exec(cmd);
+			    Runtime.getRuntime().exec(cmd2);
+			    cmd = "/bin/chgrp hand "+server_path+dyy+"/"+dmm;
+			    cmd2 = "/bin/chmod 777 "+server_path+dyy+"/"+dmm;
+			    Runtime.getRuntime().exec(cmd);
+			    Runtime.getRuntime().exec(cmd2);
+			}
+		    }
+		    RtfWriter rtfWriter = new RtfWriter(debug,
+							rent,
+							inspect,
+							inspMap,
+							fileAndPath,
+							image_url);
+		    back = rtfWriter.writeAll();
+		    if(!back.equals("")){
+			success = false;
+			message += back;
+		    }
+		    inspect.setInspFile(insp_file);
+		    back = inspect.doSaveFile();
+		    if(!back.equals("")){
+			message += " Error saving file "+back;
+			success = false;
+		    }
+		    //
+		    if(success){
+			message = "Saved successfully";
+			str = url+"InspectFileServ?id="+id;
+			res.sendRedirect(str);
+			return; 
+		    }
+		}
+	    }
+	    else{
+		message += "You could not save ";
+		success = false;
+	    }
+	    //
+	}
+	else if(action.equals("Delete")){
+	    if(user.isAdmin()){
+		String back = inspect.doDelete();
+		if(!back.equals("")){
+		    message += " Error deleting record "+back;
+		    success = false;
+		}
+		else{
+		    inspect = new Inspection(debug);
+		    inspect.setRegistrId(rental_id);
+		    id=""; // insp_id
+		}
+	    }
+	    else{
+		message = " You do not have enough previlages to delete ";
+		success = false;
+	    }
+	}
+	else{ 
+	    //
+	    // to clear posted fields
+	    //
+	    inspect = new Inspection(debug);
+	    inspect.setRegistrId(rental_id);
+	    id=""; 
+	}
+	if(id.equals("")){ 
+	    String str = "Before generating the inspection file the "+
+		"following items need to be entered in the "+
+		"main rental form: ";
+	    String all = "";
+	    if(rent.getUnits().equals("")){
+		all += "Units";
+	    }
+	    if(rent.getStructures().equals("")){
+		if(!all.equals("")) all += ", ";
+		all += "Structures";
+	    }
+	    if(rent.getOcc_load().equals("")){
+		if(!all.equals("")) all += ", ";
+		all += "Occupant Load";
+	    }			
+	    if(rent.getZoning().equals("")){
+		if(!all.equals("")) all += ", ";
+		all += "Zoning";
+	    }			
+	    if(!all.equals("")){
+		checkMessage = str + all;
+		message += str+all;
+	    }
+	}
+	//
+	out.println("<html><head><title>Rental Inspection</title>");
+	Helper.writeWebCss(out, url);
+	out.println("<script type=\"text/javascript\">");
+	out.println("  function validateForm(){		                 ");
+	out.println("  var act = '';  ");
+	out.println("  if(document.myForm.action){  ");
+	out.println("    act = document.myForm.action.value;  "); // save only
+	out.println("  } ");
+	out.println(" if ((document.myForm.comments.value.length>500)){  ");
+	out.println("  alert('In action taken field more than 500 "+
+		    "characters are entered');");	
+	out.println("  document.myForm.comments.value = "+
+		    "document.myForm.comments.value.substr(0,500);          ");
+	out.println("  	  document.myForm.comments.focus();                 ");
+	out.println("     return false;				       	    ");
+	out.println("	}						    ");
+	out.println("  var inspdate=document.myForm.inspection_date.value; ");
+	out.println(" if(document.myForm.inspection_date.value.length == 0){");
+	out.println("	      alert('Inspection Date is required');       ");
+	out.println("         document.myForm.inspection_date.focus();");
+	out.println("         return false;			            ");
+	out.println("  	  }					            ");
+	out.println(" if(!checkDate(document.myForm.inspection_date.value)){");
+	out.println("	      alert('Invalid Date ');    ");
+	out.println("         document.myForm.inspection_date.focus();");
+	out.println("         return false;			            ");
+	out.println("  	  }					            ");
+	out.println(" if(!checkDate(document.myForm.compliance_date.value)){");
+	out.println("	      alert('Invalid Date ');    ");
+	out.println("         document.myForm.compliance_date.focus();");
+	out.println("         return false;			            ");
+	out.println("  	  }					            ");
+	out.println(" if(document.myForm.smook_detectors.value == ''){");
+	out.println("	      alert('Smoke detectors field is required ');    ");
+	out.println("         document.myForm.smook_detectors.focus();");
+	out.println("         return false;			            ");
+	out.println("  	  }					            ");
+	out.println(" if(document.myForm.life_safety.value == ''){");
+	out.println("	      alert('Life safety is required ');    ");
+	out.println("         document.myForm.life_safety.focus();");
+	out.println("         return false;			            ");
+	out.println("  	  }					            ");
+	out.println(" var seld = document.myForm.inspected_by; ");
+	out.println(" if(seld.options[seld.selectedIndex].value == ''){");
+	out.println("	      alert('Plase select an inspector ');    ");
+	out.println("         seld.focus();");
+	out.println("         return false;			            ");
+	out.println("  }					            ");				
+	out.println(" var insptype = document.myForm.inspection_type.options[document.myForm.inspection_type.options.selectedIndex].value; ");
+	out.println("  if(insptype.length == 0){ ");
+	out.println("	      alert('Inspection type is required');    ");
+	out.println("         return false;			         ");
+	out.println("  	  }					         ");
+	out.println("  if(insptype =='CYCL'){                          ");
+	out.println("  if(act && act.substr(0,4) == 'Save'){");
+	out.println("  if(opener.document.myForm.last_cycle_date){          ");
+	out.println("     opener.document.myForm.last_cycle_date.value=inspdate; "); 
+	out.println("     }else{                                         ");
+        out.println(" opener.document.getElementById(\"l_cycle\").firstChild.nodeValue = inspdate; "); 
+	out.println("     }}}                                            ");
+	out.println("   if(insptype == 'REIN'){                          ");
+	out.println("     if(document.myForm.violations.value == ''){");
+	out.println("	      alert('violations number is required');  ");
+	out.println("         document.myForm.violations.focus();");		
+	out.println("         return false;			         ");
+	out.println("  	  }}					         ");
+       	out.println("     return true;				             ");
+	out.println("	}	         			                 ");
+	out.println("  function checkDate(dd){		         ");
+	out.println("   if(dd.length == 0) return true;          "); 
+	out.println("   else if(dd.length != 10){                "); 
+	out.println("      return false; }                       ");
+	out.println("   else {                                   "); 
+	out.println("   var m = dd.substring(0,2);               "); 
+	out.println("   var d = dd.substring(3,5);               "); 
+	out.println("   var y = dd.substring(6,10);              "); 
+	out.println("   if(!(dd.charAt(2) == \"/\" && dd.charAt(5) == \"/\")){ ");
+	out.println("      return false; }                            ");
+	out.println("   if(isNaN(m) || isNaN(d) || isNaN(y)){         ");
+	out.println("      return false; }                            ");
+	out.println("   if( !((m > 0 && m < 13) && (d > 0 && d <32) && ");
+	out.println("    (y > 1970 && y < 2099))){                    "); 
+	out.println("      return false; }                            ");
+	out.println("       }                                         ");
+	out.println("    return true;                                 ");
+	out.println("    }                                            ");
+	//
+	if(user.isAdmin()){
+	    out.println("  function validateDelete(){	                  ");
+	    out.println("   var x = false;                                    ");
+	    out.println("   x = confirm('Are you sure you want to delete this record');");
+	    out.println("     if(x){                                          ");
+	    out.println("  	  document.myForm.action2.value='Delete';       ");
+	    out.println("     document.myForm.submit();                       ");
+	    out.println("	  }					          ");
+	    out.println("   return x;                                       ");
+	    out.println("	}					          ");
+	}
+	out.println(" </script>		                                   ");
+	out.println(" </head><body>                                    ");
+	Helper.writeTopMenu(out, url);
+	out.println("<center>");
+	//
+	if(!message.equals("")){
+	    if(success)
+		out.println("<h2>"+message+"</h2>");
+	    else
+		out.println("<h2><font color=red>"+message+"</font></h2>");	
+	}
+	if(!id.equals("")){ 
+
+	    out.println("<h2>View Inspection</h2>");						
+	    out.println("<form name=\"myForm\" method=\"post\">");
+	    //
+	    out.println("<input type=\"hidden\" name=\"rental_id\" value=\""+rental_id+"\" />");
+						
+	    out.println("<input type=\"hidden\" name=\"id\" value=\""+id+"\" />");
+	    out.println("<table border=\"1\" width=\"80%\">");
+	    out.println("<tr><td align=\"center\">");
+	    //
+	    // 1st block
+	    //
+	    out.println("<table width=\"90%\">");
+	    out.println("<tr><td align=\"right\" width=\"40%\"><b>Rental: </b><a href=\""+url+"Rental?action=zoom&id="+id+"\">"+id+"</a></td></tr>");			
+	    out.println("<tr><td align=\"right\"><b>Inspection Date</b><td>");
+	    out.println(inspect.getInspectionDate()+"</td></tr>");
+	    out.println("<tr><td align=\"right\">");
+	    out.println("Inspection&nbsp;Type:</td><td>");
+	    if(inspectTypes != null){
+		out.println(inspMap.get(inspect.getInspectionType()));
+	    }
+	    out.println("</td></tr>");
+	    out.println("<tr><td align=\"right\">Complied:</td><td>"); // DATE
+	    out.println(inspect.getComplianceDate()+
+			"  </td></tr>");
+			
+	    out.println("<tr><td align=\"right\">Inspected by:</td><td>");
+	    out.println((inspect.getInspector() != null ? inspect.getInspector():""));
+	    out.println("</td></tr>");
+	    if(!insp_file.equals("")){
+		out.println("<tr><td align=\"right\">Inspection File:</td><td>"); 
+		if(user.hasRole("Inspect") ||
+		   user.hasRole("Edit")){
+		    //
+		    out.println("<a href=\"file:///"+fileAndPath+"\" target=\"_blank\">"+fileAndPath+"</a></td></tr>");
+		}
+		else
+		    out.println(insp_file+"</td></tr>");
+	    }
+	    out.println("<tr><td align=\"right\">Inspection Duration:</td><td>");
+	    out.println("<input name=\"time_spent\" size=\"5\" maxlength=\"5\" value=\""+
+			inspect.getTimeSpent()+"\" />(hrs dd.dd format)</td></tr>");
+	    out.println("<tr><td align=\"right\">Time Reporting Status</td><td>");
+	    out.println(inspect.getTimeStatus()+"</td></tr>");						
+	    out.println("<tr><td align=\"right\">Violations:</td><td>"); 
+	    out.println(inspect.getViolations()+
+			" </td></tr>");
+	    out.println("<tr><td align=\"right\">Smoke Detectors:</td><td>"); //	
+	    out.println(inspect.getSmookDetectors()+
+			" </td></tr>");
+	    out.println("<tr><td align=\"right\">Life Safety:</td><td>"); //	
+	    out.println(inspect.getLifeSafety()+
+			" </td></tr>");			
+	    out.println("<tr><td align=\"right\">Heat Source</td><td>");
+	    out.println(inspect.getHeatSrc());
+	    out.println("</td></tr>");
+	    out.println("<tr><td align=\"right\">Number of Stories</td><td>");
+	    out.println(inspect.getStoryCnt());
+	    out.println("</td></tr>");
+	    out.println("<tr><td align=\"right\">Foundation Type</td><td>");
+	    out.println(inspect.getFoundation());
+	    out.println("</td></tr>");
+	    out.println("<tr><td align=\"right\">Attic Access </td><td>");
+	    out.println(inspect.getAttic());
+	    out.println("</td></tr>");
+	    out.println("<tr><td align=\"right\">Accessory Structure </td><td>");
+	    out.println(inspect.getAccessory());
+	    out.println("</td></tr>");
+	    out.println("<tr><td align=\"right\">Inspection Duration(hrs) </td><td>");
+	    out.println(inspect.getTimeSpent());
+	    out.println("</td></tr>");
+	    out.println("<tr><td align=\"right\">Landlord Has Affidavit? </td><td>");
+	    out.println(inspect.getHasAffidavit());
+	    out.println("</td></tr>");						
+	    out.println("<tr><td align=\"right\">Time Reporting Status </td><td>");
+	    out.println(inspect.getTimeStatus());
+	    out.println("</td></tr>");						
+	    out.println("<tr><td align=\"right\" valign=top>Notes </td><td>");
+	    out.println(inspect.getComments());
+	    out.println("</td></tr>");
+	    out.println("<tr>");
+	    if(user.isInspector() ||
+	       user.canEdit()){
+		out.println("<td align=\"center\">");
+		out.println("<a href=\""+url+"Inspection.do?rental_id="+rental_id+"\">New Inspection</a></td>");														
+		out.println("<td valign=\"top\" align=\"right\">");
+		out.println("<input type=\"button\" name=\"action\" "+
+			    "onclick=\"document.location='"+url+
+			    "RentalFileServ?rental_id="+rental_id+"'\" "+
+			    "value=\"Add Attachment\" />&nbsp;&nbsp;");
+		out.println("</td>");								
+	    }
+	    if(user.isAdmin()){
+		out.println("<td>");
+		out.println("</td><td valign=\"top\" align=\"right\">");
+								
+		out.println("<input type=\"button\" name=\"action\" "+
+			    "onclick=\"validateDelete();\" value=\"Delete\" />");
+		out.println("<input type=\"hidden\" name=\"action2\" value=\"\" />");						
+		out.println("</td>");
+	    }
+	    out.println("</tr>");			
+	    out.println("</table></td></tr>");
+	    out.println("</form>");
+	    out.println("</table><br />");
+	}
+	else{
+	    /**
+	       if(user.isInspector() ||
+	       user.canEdit()){
+	       out.println("<h2>New Inspection </h2>");								
+	       out.println("<form name=\"myForm\" method=\"post\" "+
+	       "onSubmit=\"return validateForm()\">");
+	       if(!rental_id.equals("")){
+	       out.println("<input type=\"hidden\" name=\"rental_id\" value=\""+rental_id+"\" />");
+	       }
+	       out.println("<table border width=\"90%\">");
+	       out.println("<tr><td align=\"center\">");			
+	       //
+	       // 1st block
+	       //
+	       out.println("<table width=\"100%\">");
+	       out.println("<tr><td align=\"right\" width=\"50%\"><b>Rental: </b></td><td><a href=\""+url+"Rental?id="+rental_id+"\">"+rental_id+"</a></td></tr>");					
+	       out.println("<tr><td align=\"right\">");	
+	       out.println("<b>Inspection Date:</b> </td><td>");
+	       out.println("<input name=\"inspection_date\" "+
+	       "id=\"inspection_date\" class=\"date\" "+
+	       "value=\""+inspect.getInspectionDate()+"\" "+
+	       " size=\"10\" maxlength=\"10\" />");
+	       out.println("</td></tr>");
+	       out.println("<tr><td align=\"right\">");
+	       out.println("<b>Inspection Type:</b></td><td>");
+	       out.println("<select name=\"inspection_type\">");
+	       out.println("<option value=\"\">Pick Inspection Type</option>");
+	       if(inspectTypes != null){
+	       for(Item inspectType: inspectTypes){
+	       if(inspect.getInspectionType().equals(inspectType.getId()))
+	       out.println("<option selected=\"selected\" value=\""+inspectType.getId()+
+	       "\">"+inspectType+"</option>");
+	       else
+	       out.println("<option value=\""+inspectType.getId()+
+	       "\">"+inspectType+"</option>");
+	       }
+	       }
+	       out.println("</select></td></tr>");
+	       //
+	       // Complied
+	       out.println("<tr><td align=\"right\"><b>Complied:</b></td><td>"); 
+	       out.println("<input name=\"compliance_date\" "+
+	       "id=\"compliance_date\" class=\"date\" "+
+	       "value=\""+inspect.getComplianceDate()+"\" "+
+	       "size=\"10\" maxlength=\"10\" />");
+	       out.println("&nbsp;<b>Violations:</b>");
+	       out.println("<input name=\"violations\" value=\""+
+	       inspect.getViolations()+
+	       "\" size=\"4\" maxlength=\"4\" />*</td></tr>");
+	       out.println("<tr><td align=\"right\"><b>Smoke Detectors:</b></td><td>");
+	       out.println("<input name=\"smook_detectors\" value=\""+
+	       inspect.getSmookDetectors()+
+	       "\" size=\"2\" maxlength=\"3\" />*");
+	       out.println("&nbsp;&nbsp;<b> Life Safety:</b> ");
+	       out.println("<input name=\"life_safety\" value=\""+
+	       inspect.getLifeSafety()+"\" size=\"2\" maxlength=\"3\" />*</td></tr>");		
+	       //
+	       // Inspected by
+	       out.println("<tr><td align=\"right\"><b>Inspected by:</b></td><td>");
+	       //
+	       // for new records we use current list 
+	       out.println("<select name=\"inspected_by\">");
+	       out.println("<option value=\"\">Pick Inspector</option>");
+	       if(inspectors != null){
+	       for(Inspector one:inspectors){
+	       if(one.isActive()){
+	       String selected = "";
+	       if(one.getInitials().toLowerCase().equals(user.getUsername())){
+	       selected="selected=\"selected\"";
+	       }
+	       out.println("<option value=\""+one.getInitials()+
+	       "\" "+ selected+">"+one+"</option>");
+	       }
+	       }
+	       }
+	       out.println("</select>");
+	       out.println("</td></tr>");
+	       //
+	       out.println("<tr><td align=\"right\"><b>Number of Stories:</b></td><td>");
+	       out.println("<input name=\"story_cnt\" value=\""+ inspect.getStoryCnt()+
+	       "\" size=\"2\" maxlength=\"2\" />&nbsp;");
+	       out.println("<b>Heat Source:</b>");
+	       out.println("<select name=\"heat_src\">");
+	       out.println("<option selected=\"selected\">"+inspect.getHeatSrc()+"</option>\n");
+	       out.println(allHeatSrc);
+	       out.println("</td></tr>");
+	       out.println("<tr><td align=\"right\"><b>Foundation Type:</b></td><td>");
+	       out.println("<select name=\"foundation\">");
+	       for(int i=0;i<foundArr.length;i++){
+	       if(inspect.getFoundation().equals(foundArr[i]))
+	       out.println("<option selected=\"selected\">"+
+	       inspect.getFoundation()+"</option>\n");
+	       else
+	       out.println("<option>"+foundArr[i]+"</option>\n");
+	       }
+	       out.println("</select>&nbsp;&nbsp;");
+	       //
+	       out.println("<b>Attic Access:</b> ");
+	       out.println("<select name=\"attic\">");
+	       for(int i=0;i<atticArr.length;i++){
+	       if(inspect.getAttic().equals(atticArr[i]))
+	       out.println("<option selected=\"selected\">"+atticArr[i]+"</option>\n");
+	       else
+	       out.println("<option>"+atticArr[i]+"</option>\n");
+	       }
+	       out.println("</select></td></tr>");
+	       out.println("<tr><td align=\"right\"><b>Accessory Structure:</b></td><td>");
+	       out.println("<input name=\"accessory\" size=\"30\" maxlength=\"30\" value=\""+
+	       inspect.getAccessory()+"\" /></td></tr>");
+	       out.println("<tr><td align=\"right\"><b>Landlord Has Affidavit?</b></td><td>");								
+	       out.println("<select name=\"has_affidavit\">");
+	       for(int i=0;i<affidavitArr.length;i++){
+	       if(inspect.getHasAffidavit().equals(affidavitArr[i]))
+	       out.println("<option selected=\"selected\">"+affidavitArr[i]+"</option>\n");
+	       else
+	       out.println("<option>"+affidavitArr[i]+"</option>\n");
+	       }
+	       out.println("</select></td></tr>");								
+	       out.println("<tr><td align=\"right\"><b>Inspection Duration:</b></td><td>");
+	       out.println("<input name=\"time_spent\" size=\"5\" maxlength=\"5\" value=\""+
+	       inspect.getTimeSpent()+"\" />(hrs dd.dd format)</td></tr>");
+	       out.println("<tr><td align=\"right\"><b>Time Reporting Status:</b></td><td>");
+	       out.println(inspect.getTimeStatus()+"</td></tr>");
+	       out.println("<tr><td align=\"right\"><b>Comments: </b></td><td align=left><font color=green "+
+	       "size=\"-1\"> up to 500 characters</font></td></tr>");
+	       out.println("<tr><td align=\"right\">&nbsp;</td><td>");			
+	       out.println("<textarea rows=\"2\" cols=\"60\" wrap name=\"comments\" >");
+	       out.println(inspect.getComments());
+	       out.println("</textarea>");
+	       out.println("</td></tr></table>");
+	       out.println("<tr><td><table width=\"60%\">");
+	       if(checkMessage.equals("")){
+	       if(user.isInspector() || user.canEdit()){
+	       out.println("<tr><td align=\"right\">  "+
+	       "<input type=\"submit\" "+
+	       "name=\"action\" "+
+	       "value=\"Save and Generate Inspection "+
+	       "Report\"></td></tr>");
+	       }
+	       }
+	       else{
+	       out.println("<tr><td colspan=\"2\"><font color=\"green\">"+
+	       checkMessage+"</font></td></tr>");
+	       }
+	       }
+	       out.println("</table></td></tr>");
+	       out.println("</form>");
+	       out.println("</table><br />");
+	    */
+	}
+	//
+	// send what we have so far
+	//
+	out.flush();
+	InspectionList inspects = new InspectionList(debug, rental_id);
+	String back = inspects.find();
+	if(inspects == null || inspects.size() == 0){
+	    out.println("No inspection done yet <br>");
+	}
+	else {
+	    Helper.writeInspections(out, url, inspects);
+	}
+	Helper.writeWebFooter(out, url);
+
+	out.print("</body></html>");
+	out.close();
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

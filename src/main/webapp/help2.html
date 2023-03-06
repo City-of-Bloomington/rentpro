@@ -1,0 +1,276 @@
+<HTML>
+<HEAD>
+<!-- Author: W. Sibo/ ITS City Hall Bloomington --->
+<!-- Date: August 2003 ----------------------------->
+<TITLE>
+RentPro Help Page
+</TITLE>
+</HEAD>
+<body>
+<BR><br><center>
+<h1> RentPro Help and User Manual </h1></center>
+<h3>Contents</h3>
+<ul>
+<li><a href=#intro> Introduction </a> 
+<li><a href=#run> Running RentPro </a>
+<li><a href=#login> Logging in RentPro </a>	
+<li><a href=#menu> User Menu Options </a>
+<li><a href=#variance> Variance </a>
+<li><a href=#inspect> Inspections </a>
+<li><a href=#images> Images </a>
+<li><a href=#comp> Complaints </a>
+<li><a href=#search> Simple and Extensive Search for Permits </a>
+<li><a href=#addr> Check Address</a>
+<li><a href=#logout> Logout</a>
+<li><a href=#help> Help </a>
+</ul>
+
+
+<a name=intro>
+<h2>Introduction</h2>
+<!--           ----->
+<p>
+This system is intended to facilitate the registration of rental properties in Bloomington and issue permits for property owners. It provide the means to track the registration process, inspection, billing and other related activities. 
+This system will provide the search engine and issue reports to measure performance. All authorized users will be able to view and navigate in the system, lookup permits, rental property owners, rental agents, complaint related to rental properties, .. etc.
+<p>
+This manual will give users an introduction to the Rental Processing System (RentPro).  The system is written in Java Servlets. A web based user interface with Oracle Database as backend data store. It can be run on any computer with network connection and a web browser such as Netscape and MS Internet Explorer.  The application objective was the ease of use and web enabled so that the HAND employee will be able to use it from his/her desktop without any specific installations on his/her computer.
+<p>
+This application came as a replacement for the old rental application that has been used in the City for a number of years.  The two application can co-exist together even though the new one has more features built in, new data fields, new reports and an extensive search engine. 
+</p>
+
+
+<a name=run>
+<h2>Running RentPro </h2>
+<!--              ----->
+<p>
+Only authorized employees will be able to run this program. This help manual is intended for viewing purpose only with limited privileges. 
+To access this system the user need to start his favorite browser (such as Netscape) and type 'http://rentpro' in the URL location. The user will  be introduced to the RentPro welcome page as the one shown below.
+ </P>
+
+<!-- picture -->
+<center>
+<table><tr><td>
+<img src=http://localhost:8080/images/rent/docs/rentpro.jpg>
+</td></tr>
+<tr><td><b>Fig. 1</b> RentPro Welcome Page 
+</td></tr></table>
+</center>
+
+<a name=login>
+<h2>Logging in RentPro System </h2>
+<!--                     --------->
+<p>
+When the user clicks on the link 'here' in the welcome page the user will be presented with the Login form where the user has to use his own username and password. These are the same username and password the user would use to access his email. The Login form is shown in Fig. 2.
+</p>
+
+<!-- picture -->
+<center>
+<table><tr><td>
+<img src=http://localhost:8080/images/rent/docs/login.jpg>
+</td></tr>
+<tr><td><b>Fig. 2</b> The Login Page 
+</td></tr></table>
+</center>
+<p>
+ After a successful entry of username and password the user will be introduced to the 'User Menu' page.
+
+<a name=menu>
+<h2>User Menu Options</h2>
+<!----                 -->
+<p>
+ In the  user menu page the user can start a New Permit, a New Owner, searching and so on. The user menu options panel is shown in Fig. 3.
+</P>
+
+<!-- picture -->
+<center>
+<table><tr><td>
+<img src=http://localhost:8080/images/rent/docs/menu2.jpg>
+</td></tr>
+<tr><td><b>Fig. 3</b> User Menu 
+</td></tr></table>
+</center>
+<p>
+The user should spend some time reading the instruction on this page and start navigating through different options. The left side options panel will always be there so that what ever the user is doing he/she can quickly and easily switch to other options. The current options as listed in the left panel are;
+<nl>
+<li> Simple Search.
+<li> Extensive Search.
+<li> Owners Search.
+<li> Check Address.
+<li> Help (this document).
+<li> Logout from the System.
+</nl>
+
+<p>
+ Probably other options will be added as needed in the future. Some options may not be availbable for every user, depending on the privilege level associated with that user. 
+
+<p>
+Other buttons will show on the form. These are;
+<li> Variance: Start the variance form for this permit.
+<li> Inspection: The inspection form for this permit.
+<li> Images: Browse the images related to this permit (if any).
+<li> Complaint: Check the complaint related to this property from the 
+     complaint system (ReqPro).
+
+<a name=variance>
+<h2>Variance</h2>
+From the registration form the user can click on the "Variance" (Fig. 4) button to view the variances related to this permit. 
+
+<p>
+<!-- picture -->
+<center>
+<table><tr><td>
+<img src=http://localhost:8080/images/rent/docs/variance.jpg>
+</td></tr>
+<tr><td><b>Fig. 4</b> Add Variance to Permit.
+</td></tr></table>
+</center>
+
+<a name=inspect>
+<h2>Inspection</h2>
+<p>
+To view the old inspection instances on this permit.
+ The user will click on Inpection button in the Registration form. A new smaller window will popup with the inspection information (if any). See Fig. 5</p>
+
+<!-- picture -->
+<center>
+<table><tr><td>
+<img src=http://localhost:8080/images/rent/docs/inspection.jpg>
+</td></tr>
+<tr><td><b>Fig. 5</b> View inspections.
+</td></tr></table>
+</center>
+
+<a name=images>
+<h2>Images </h2>
+<!----    ----->
+<p>
+From the registration form the user can click on the Inages button to open a floating window that will let the user view all the images taken for subjects related to this permit. With each image some notes might be entered to give the details of the purpose of the image. See Fig. 6.
+</p>
+
+<!-- picture -->
+<center>
+<table><tr><td>
+<img src=http://localhost:8080/images/rent/docs/image.jpg>
+</td></tr>
+<tr><td><b>Fig. 6</b> View images related to the properties in this permit.
+</td></tr></table>
+</center>
+<a name=comp>
+<h2>Complaints</h2>
+<!--            -->
+From the registration form the user can check if any complaint has been associated with properties included in this permit by clicking on the "Complaint" button. A list of complaints will show up in a table (if any). Or no complaints message will be displayed. These are the complaints entered in the complaint system currently named as ReqPro and previously known as citizen action. Fig. 7 shows a list of complaints associated with the address 401 N. Morton St.
+</P>
+<!-- picture -->
+<center>
+<table><tr><td>
+<img src=http://localhost:8080/images/rent/docs/complain.jpg>
+</td></tr>
+<tr><td><b>Fig. 7</b> A sample of complaints.
+</td></tr></table>
+</center>
+
+<a name=search>
+<h2>Simple and Extensive Search for Permits</h2>
+<p> 
+The idea behind two different kinds of searche is due to the fact that the registration system is based on a number of tables in the database. The main table is the registration table. In addition there are the owner table, address table, zoning table, .. .etc. The simple search is devoted to search mainly in the registration table only where address or owner information are not required in the search process. While the extensive search is intended to be used for complicated queries when the address or owner info for examople are important part of the search. Since the extensive search is based on the projection of multiple tables, some records coould be repeated. For example a permit with two owners could show as two records one for each owner. Similary for two addresses. In simple search each record will show up only once. 
+<p>
+Which search to use? To answer this question consider the following;
+<li> if looking for a record with a known id then use the simple search. 
+<li> if looking for records between two periods, use simple search too.
+<li> if looking permits associated with certain owner, agent, address, zone or any inputs that are not available in simple search then use the extensive search.
+<li> As a rule of thumb use simple search first, if you think this form will not give you the necessary fields to make your query then use the extensive search.
+<li> Simple search will work faster as the query is simpler.
+<li> You may get results in simple search that you may not get in extensive search.
+<p> In the search forms most of the text fields are case insensitive. The option of full match (is), start with, ends with or contains is also provided to increase the possibilities of matching operations. Such as street name, owner name, owner address and notes fields all carry this feature.
+</P>
+<p> <font color=red>Caution </font> Try not to use the search engine without any entries. If for any reason the "Browse" button without filling any field, this means the user is asking for all the records in the system. Since these count in a number of thousands, this may take long time to get the result or you may get partial results and the possibility of the browser being hang. In this case try to close your browser and restart again and try to avoid this situation in the futur. To overcome this problem, the user is adviced to enter a reasonble range of dates that cover no more than one year at a time such as 01/01/2000 to 01/01/2001 and so on. Fig. 8 is the simple search interface.
+</p>
+<p> If there is no match in the query options, the program will mention that no match found. If there is a match , the program will kist these in a table, where the first column contains the permit ID of each record. Clicking on any one of these will open the rental registration record in the registration page with more details. 
+</p>
+
+<!-- picture -->
+<center>
+<table><tr><td>
+<img src=http://localhost:8080/images/rent/docs/simple_search.jpg>
+</td></tr>
+<tr><td><b>Fig. 8</b> Simple Search Form
+</td></tr></table>
+</center>
+
+<p>
+In the search form we want to see all reocrds that have been registered during   July 1-2003 and Aug 6-2003. This is an example of what we got (Fig. 9). Notice in the top of the page the option of sorting the table according to the options mentioned in the list.
+</p>
+<!-- picture -->
+<center>
+<table><tr><td>
+<img src=http://localhost:8080/images/rent/docs/search_out.jpg>
+</td></tr>
+<tr><td><b>Fig. 9</b> Simple Search Results
+</td></tr></table>
+</center>
+
+
+<p>
+To have more details about any of the permits in this list we clicked on one of records. The permit information are shown in Fig. 10. From this page you can click on the Owner's link, or Agent's link to have more details about them. Also by clicking on one of the buttons you get a page of related information.
+</p>
+
+<!-- picture -->
+<center>
+<table><tr><td>
+<img src=http://localhost:8080/images/rent/docs/view_reg.jpg>
+</td></tr>
+<tr><td><b>Fig. 10</b> View of Registration Page.
+</td></tr></table>
+</center>
+
+
+<a name=addr>
+<h2>Check Address</h2>
+<p>
+A search engine for addresses. Has two main goals. To verify that certain address exists in the GIS master address. Second to check if certain address is already used in the rental system. If the rental system is used the corresponding permit ID's will be listed in the matching table where the user can jump to the corresponding permit.
+<p>Search for street name is case insensitive and could be partial match whern used with the options of "start with", "ends with", or "contains" otherwise it is a complete match with "is" option.
+<p>When searching for an address use as little information as possible, such as street name. To narrow your search you can fill other fields such as street number and direction. See Fig. 11 for more details.
+</P>
+
+<!-- picture -->
+<center>
+<table><tr><td>
+<img src=http://localhost:8080/images/rent/docs/checkaddr.jpg>
+</td></tr>
+<tr><td><b>Fig. 11</b> Check Address Form
+</td></tr></table>
+ </center>
+
+
+<a name=logout>
+<h2>  Logout </h2>
+<!---          -->
+<p>
+It is important for each user to Log Out from the system when he/she is done. This operation will release the resources used by the login session. In addition it will protect the data from being tempered with by curious users. The logout option is available on the left panel and also in most of the right frames in the bottom part of the page.
+</P>
+
+
+<a name=priv>
+<h2> Privileges </h2>
+<!---           ---->
+<p>
+	Since this system will be used by different departments in the City at the same time, the need to manage this system is essential for its success. The following was considered in the design of this package;
+<li>
+ All the departments except HAND are allowed to use the system to extract information that help the daily acitivities but are not allowed to do update or deletes. The authorized users in HAND department are the only authorized to do updates,inserts and deletes on this system according to the privileges granted to the users.
+
+</p>
+
+<a name=help>
+<h2> Help </h2>
+<!---     ---->
+<p>
+This documentation.
+                                             
+For more help call the ITS helpdesk or go online to
+ <a href=http://helpdesk>HelpDesk </a> to report any problem.
+
+<br>
+<br>
+
+</body>
+</html>

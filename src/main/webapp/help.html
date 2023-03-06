@@ -1,0 +1,490 @@
+<HTML>
+<HEAD>
+<!-- Author: W. Sibo/ ITS City Hall Bloomington --->
+<!-- Date: April 2003 ----------------------------->
+<TITLE>
+RentPro Help Page
+</TITLE>
+</HEAD>
+<body>
+<BR><br><center>
+<h1> RentPro Help and User Manual </h1></center>
+<h3>Contents</h3>
+<ul>
+<li><a href=#intro> Introduction </a> 
+<li><a href=#run> Running RentPro </a>
+<li><a href=#login> Logging in RentPro </a>	
+<li><a href=#menu> User Menu Options </a>
+<li><a href=#add> Add a New Registration (Permit)</a>
+<li><a href=#addown> Add a New Owner </a>
+<li><a href=#addownperm> Add an Owner/Agent to a Permit </a>
+<li><a href=#variance> Variance </a>
+<li><a href=#inspect> Inspections </a>
+<li><a href=#images> Handling Images </a>
+<li><a href=#comp> Complaints </a>
+<li><a href=#bill> Billing </a>
+<li><a href=#update> Update a Permit </a>
+<li><a href=#delown> Delete an Onwer/Agent from a Permit </a>
+<li><a href=#deladdr> Delete an Address from a Permit </a>
+<li><a href=#editaddr> Edit an Address in a Permit </a>
+<li><a href=#search> Simple and Extensive Search for Permits </a>
+<li><a href=#addr> Check Address</a>
+<li><a href=#reports> Reports</a>
+<li><a href=#statrep> Statistics Reports</a>
+<li><a href=#logout> Logout</a>
+<li><a href=#priv> Privileges</a>
+<li><a href=#help> Help </a>
+</ul>
+
+
+<a name=intro>
+<h2>Introduction</h2>
+<!--           ----->
+<p>
+This system is intended to facilitate the registration of rental properties in Bloomington and issue permits for property owners. It provide the means to track the registration process, inspection, billing and other related activities. 
+This system will provide the search engine and issue reports to measure performance. This system is desinged for the HAND department. 
+<p>
+This manual will give users an introduction to the Rental Processing System (RentPro).  The system is written in Java Servlets. A web based user interface with Oracle Database as backend data store. It can be run on any computer with network connection and a web browser such as Netscape and MS Internet Explorer.  The application objective was the ease of use and web enabled so that the HAND employee will be able to use it from his/her desktop without any specific installations on his/her computer.
+<p>
+This application came as a replacement for the old rental application that has been used in the City for a number of years.  The two application can co-exist together even though the new one has more features built, new data fields, new reports and an extensive search engine. 
+<p>
+This course will walk you through this program by simple steps with snap shots of the real interface forms with the explanations of different options and what to expect.  
+
+<a name=run>
+<h2>Running RentPro </h2>
+<!--              ----->
+<p>
+Only authorized HAND employees will be able to run this program.
+Some of the Employees will have more privileges to update and/or delete records. These employees will have different levels of privileges as will be explained in the section 'Privileges'. To access this system the user need to start his favorite browser (such as Netscape) and type 'http://rentpro' in the URL location. The user will  be introduced to the RentPro welcome page as the one shown below.
+ </P>
+
+<!-- picture -->
+<center>
+<table><tr><td>
+<img src=http://plateau/images/rent/docs/rentpro.jpg>
+</td></tr>
+<tr><td><b>Fig. 1</b> RentPro Welcome Page 
+</td></tr></table>
+</center>
+
+<a name=login>
+<h2>Logging in RentPro System </h2>
+<!--                     --------->
+<p>
+When the user clicks on the link 'here' in the welcome page the user will be presented with the Login form where the user has to use his own username and password. These are the same username and password the user would use to access his email. The Login form is shown in Fig. 2.
+</p>
+
+<!-- picture -->
+<center>
+<table><tr><td>
+<img src=http://plateau/images/rent/docs/login.jpg>
+</td></tr>
+<tr><td><b>Fig. 2</b> The Login Page 
+</td></tr></table>
+</center>
+<p>
+ After a successful entry of username and password the user will be introduced to the 'User Menu' page.
+
+<a name=menu>
+<h2>User Menu Options</h2>
+<!----                 -->
+<p>
+ In the  user menu page the user can start a New Permit, a New Owner, searching and so on. The user menu options panel is shown in Fig. 3.
+</P>
+
+<!-- picture -->
+<center>
+<table><tr><td>
+<img src=http://plateau/images/rent/docs/menu.jpg>
+</td></tr>
+<tr><td><b>Fig. 3</b> User Menu 
+</td></tr></table>
+</center>
+<p>
+The user should spend some time reading the instruction on this page and start navigating through different options. The left side options panel will always be there so that what ever the user is doing he/she can quickly and easily switch to other options. The current options as listed in the left panel are;
+<nl>
+<li> New Permit.
+<li> New Owner.
+<li> Simple Search.
+<li> Extensive Search.
+<li> Owners Search.
+<li> Check Address.
+<li> Reports.
+<li> Statistics Reports.
+<li> Help (this document).
+<li> Logout from the System.
+</nl>
+<p>
+ Probably other options will be added as needed in the future. Some options may not be availbable for every user, depending on the privilege level associated with that user. 
+
+<a name=add>
+<h2> Add a New Permit or Registration </h2>
+<!--                   ---->
+<p>
+Clicking on the first option in the left panel of options the user will be introduced to the 'New Registration" form as shown in Fig. 4.
+</p>
+
+<!-- picture -->
+<center>
+<table><tr><td>
+<img src=http://plateau/images/rent/docs/new_reg.jpg>
+</td></tr>
+<tr><td><b>Fig. 4</b> Add a New Registration
+</td></tr></table>
+</center>
+
+<p>
+All the basic information are in the top part, such as the address and the owner information. The lower part of the form is mainly devoted for notes and processing (see Fig. 5). 
+<p>
+In this form, even though it is desirable to fill in as much information as possible the user is required to fill in at least the address information such as street name and number. This is because it is not always possible to get all the information right away, but probably can be added later as it becomes available through the inspection operations.    
+<p>
+Some of the fields in this form are drop down lists, so the user can select directly, other fields are text field where the user will type in. For the date fields the "today" check boxes are provided to simplify the data entry. 
+</P>
+
+<p>
+When all the information is entered the user should always click on the 'Create' button to create the new record and save it in the database.  
+ </P>
+
+<p>
+After clicking on the Create button the user will be presented with the same form again with some additional buttons for further processing. A small message will appeare on the top of the page to show that the registration has been saved (in green) or an error message (in red) if a problem occurred. So watch for these messages carefully and proceed accordingly.  The additional items in the form are shown in Fig. 5.</p>
+
+ <!-- picture -->
+<center>
+<table><tr><td>
+<img src=http://plateau/images/rent/docs/update.jpg>
+</td></tr>
+<tr><td><b>Fig. 5</b> More Buttons on the Registration Form
+</td></tr></table>
+</center>
+<p>
+Other buttons will show up on the form. These are;
+<li> Update: to update and execute changes on the form.
+<li> Delete: To delete this record.
+<li> Add Owner/Agent: To add owners/agent to this permit.
+<li> Bill: Start the bill form related to this permit.
+<li> Variance: Start the variance form for this permit.
+<li> Inspection: The inspection form for this permit.
+<li> Permit: Show a printable permit page.
+<li> Images: Browse or add images to this permit.
+<li> Complaint: Check the complaint related to this property from the 
+     complaint system (Reqpro).
+<li> Renew This Permit: Make a copy of this permit in a new record and 
+     a new id (to be explored and tested later).
+
+<p>
+If the permit is created successfully the user can always update and do some changes on the same recordt and then click the 'Update' button (shown in Fig.6). For example adding an owner or an address to the permit and clicking on Update button. 
+</p>
+
+<a name=addown>
+<h2>Add a New Owner</h2>
+<p>
+New Owner can be added to the system by selecting the "New Owner" from the left panel of options. The user will be introduced to Owner form where the user can enter the Owner's name, address, city, state, zip and phones. Other communication info can be added in the Notes field if needed in addition to other comments if the user found useful to have. It is important that the owner records to be unique in identifying them. Therefore, it is a good idea to check for the new owner and make sure that they are not already in the system by using Search Owner option in the left panel. If the owner is not in the system then he/she can be added to the system. Fig. 6 is the interface for adding a new Owner or Agent to the system.
+
+<!-- picture -->
+<center>
+<table><tr><td>
+<img src=http://plateau/images/rent/docs/new_own.jpg>
+</td></tr>
+<tr><td><b>Fig. 6</b> New Owner Option.
+</td></tr></table>
+</center>
+
+<a name=addownperm>
+<h2>Add Owner/Agent to a Permit</h2>
+<p>
+Pressing on the "Add Owner/Agent" button opens the Add Owner/Agent interface where the user can search for the owner or agent. The user can type the username or owner's id if it is known to the user. The system will search for the matching names and presents them in a list where the user can check the ones that will be added as owners or agents. It is important that the user know if the owner/agent is in the system or not. If the owner or agent is not in the system, the user need to enter the new owner in the system before adding him/her to the permit by choosing "New Owner" from the left panel of options. Fig. 7 is an example of searching for an owner. 
+</p>
+
+<!-- picture -->
+<center>
+<table><tr><td>
+<img src=http://plateau/images/rent/docs/add_own.jpg>
+</td></tr>
+<tr><td><b>Fig. 7</b> Search for an Owner/Agent to Add to Permit.
+</td></tr></table>
+</center>
+
+<p>
+In Fig. 8 is an example of a matching search list of owners who matched our search criteria. We need to add a check mark in front of the owner that we want hem/her ot be added as owner or agent to the permit. We can add one agent to the permit, but we can added as many owners to the permit as we like.
+
+<!-- picture -->
+<center>
+<table><tr><td>
+<img src=http://plateau/images/rent/docs/add_own2.jpg>
+</td></tr>
+<tr><td><b>Fig. 8</b> Add Owner/Agent to Permit.
+</td></tr></table>
+</center>
+
+<a name=variance>
+<h2>Variance</h2>
+From the registration form the user can click on the "Variance" (Fig. 9) button to add a new variance record to this permit. The variance form will open in a new small floating window where the user has the option of entering a new variance record which consists of date and text. The date is defualted to current date but can be changed to the right date. The will click on the "Save" button to save this record. This form also presents to the user any variance records entered before  The user can select any of these records to update if he/she opt to by clciking on the first column (variance date) in the table.
+<p>
+<!-- picture -->
+<center>
+<table><tr><td>
+<img src=http://plateau/images/rent/docs/variance.jpg>
+</td></tr>
+<tr><td><b>Fig. 9</b> Add Variance to Permit.
+</td></tr></table>
+</center>
+
+<a name=inspect>
+<h2>Inspection</h2>
+<p>
+To view the old inspection instances on this permit or to add a new inspection instance the user will click on Inpection button in the Registration form. A new smaller window will popup with the inspection information (if any). To add a new inspection record just fill the upper part of the form with inspection date, select the inspection type, complied date, number of violations, select the inspector's name and inspection file and then hitting "Save".
+Updating an inspection record will be in the same form. First select the recoed from the list of inpsection records (click on the first field in the table) and do the changes and then hit the "Update" button. a new request/complaint click on the 'New request' option on the left panel and continue as before or switch to the other options if desirable. See Fig. 10</p>
+
+<!-- picture -->
+<center>
+<table><tr><td>
+<img src=http://plateau/images/rent/docs/inspection.jpg>
+</td></tr>
+<tr><td><b>Fig. 10</b> View or Add inspection record to permit.
+</td></tr></table>
+</center>
+
+<a name=images>
+<h2>Handling Images </h2>
+<!----             ----->
+<p>
+From the registration form the user can click on the Inages button to open a floating window that will let the user upload a new image to this permit. A few points to consider before updoading a new image. 
+<li>Download the image from the Digital Camera to your desktip.
+<li> Rename the image according to the following 
+<ul>
+  <li> do not include any space in the neme.
+  <li> an initial name such as the inspector username or the road name of the property followed by two digits for month, followed by two digits for day, followed by two digits for sequence. 
+  <li> the image must have the extension as .jpg or .JPG. Other possible extension are .gif or .GIF but oftern these are not popular in digital cameras in the market but could be obtained by using softwares such Photoshop and others. Some sanners may give you this option too.
+  <li> the image size should not exceed one meg of bytes. 
+  <li>The following are valid image names: roger110122.jpg, roger11.01.22.jpg, roger11_01_22.jpg, roger11.01.22.gif
+  <li>The following are not valid image names: "roger" (no extension), "roger 11 01 22.jpg" (contain spaces), "roger110122.tif (unsupported format).
+
+  <li>These are not good image names, roger.jpg (missing date and sequence), roger1101.jpg (missing sequence), roger11.1.1.jpg (need two digits for day and 
+  </ul>
+<li>Upload the image to form by clicking on the "Browse" button where you  select the image you have renamed from your desktip
+ <li>You can add any comments to this picture that will remind you of the purpose of this picture and what it presents and any other info that may be helpful.
+ <li> Hit the "Save" button.
+ <li> If any problem happens during the upload an error message will show up. Potential probems could be either the image name is too long or the image size is more than one meg of bytes. If the image was uploaded properly, it will show up in the form and will be added to the list of images of this property that will appear underneath this form. See Fig. 11.
+</p>
+
+<!-- picture -->
+<center>
+<table><tr><td>
+<img src=http://plateau/images/rent/docs/image.jpg>
+</td></tr>
+<tr><td><b>Fig. 11</b> View or Upload images to permit.
+</td></tr></table>
+</center>
+<a name=comp>
+<h2>Complaints</h2>
+<!--            -->
+From the registration form the user can check if any complaint has been associated with properties included in this permit by clicking on the "Complaint" button. A list of complaints will show up in a table (if any). Or no complaints message will be displayed. These are the complaints entered in the complaint system currently name as ReqPro and previously known as citizen action. Fig. 12 shows a list of complaints associated with the address 401 N. Morton St.
+</P>
+<!-- picture -->
+<center>
+<table><tr><td>
+<img src=http://plateau/images/rent/docs/complain.jpg>
+</td></tr>
+<tr><td><b>Fig. 12</b> A sample of complaints.
+</td></tr></table>
+</center>
+
+<a name=bill>
+<h2>Billing</h2>
+<!----       -->
+<p>
+To issue a bill for a permit click on the "Bill" button. The bill form will appear. A number of fields will be extracted the permit record while other fields will be filled by the user. The user can change the default values of the fees. When the user is done with data entry, he/she will want to click on the "Create Bill" button. A printable page will be displayed so that it can be printed on an official paper.<br>
+  <p>
+The bill form (Fig. 13) will display any previous bill issued for this permit starting from the current year (july 2003) under the main form.
+</P>
+
+<!-- picture -->
+<center>
+<table><tr><td>
+<img src=http://plateau/images/rent/docs/bill.jpg>
+</td></tr>
+<tr><td><b>Fig. 13</b> Billing interface.
+</td></tr></table>
+</center>
+
+<p> After entering all necessary entries in the bill form, the user can press the "Create Bill" button. After that you can choose that bill from the list of bills for that property to issue a receipt. Fig.14 shows additional options for bill operations after the bill has been created. </p>
+
+<!-- picture -->
+<center>
+<table><tr><td>
+<img src=http://plateau/images/rent/docs/bill2.jpg>
+</td></tr>
+<tr><td><b>Fig. 14</b> Additional bill options.
+</td></tr></table>
+</center>
+
+
+<p>
+After the bill is created, the bill info are saved in the database. Go back to permit form and hit the Bill button again. You will get a list of previously issued bills including the one just created. Select that one by clicking on the date link correspondiing to that bill. The bill form will refresh with bill information and the option of creating a receipt. Hit the Create Receipt button to issue a receipt that can be printed.
+
+<a name=update>
+<h2>Update a Permit</h2>
+To update a Permit record, first look for permit using the information you have
+about the permit. Simple search is a good option. Enter the permit ID and hit 
+Browse button. Then click on the ID field of the record that match what you are looking for. The old permit information will be displayed in the Permit form. Do any modification you want and then hit the Update button. Certain users can delete the record from the system (if the record is deleted all related information will be deleted as well and can't be recovered any more, so be careful with this option). </p>
+
+<a name=delown>
+<h2> Delete an Owner/Agent from a Permit</h2>
+After bringing the permit on the permit form. Make sure the Owner or Agent that  you want to delete is showing in the Owner or Agent area. Check the checkbox to the left of the owner/agent that need to be deleted and then hit the Update button. After that you see that the Owner/Agent is deleted. If for any reason you want to add the same owner/agent back to this or other permit follow the instructions in <a href=#addownperm>"Adding Owner/Agent to a Permit </a>. 
+</P>
+
+<a name=deladdr>
+<h2> Delete an Address from a Permit</h2>
+From the Permit form check the checkbox infront of the address that needs to be deleted and hit the Update button. You will notice that that address will disappear from that Permit. You can add the address back to the permit by typing the address components in the address fields in top of the form and then hitting the Update button.
+
+<a name=editaddr>
+<h2> Edit an Address </h2>
+<p> Editing an address is needed when the address is considered invalid. The address is invalid when it is shown in red and a message about invalidity of the address. To edit the address click on the "edit address" link next the address. The address editor window will open so that the address can be changed.
+</P>
+
+
+<a name=search>
+<h2>Simple and Extensive Search for Permits</h2>
+<p> 
+The idea behind two different kind of searches is due to the fact that the registration system is based on a number of tables in the database. The main table is the registration table. In addition there are the owner table, address table, zoning table, .. .etc. The simple search is devoted to search mainly in the registration table only where address or owner information are not required in the search process. While the extensive search is intended to be used for complicated queries when the address or owner info for examople are important part of the search. Since the extensive search is based on the projection of multiple tables, some records coould be repeated. For example a permit with two owners could show as two records one for each owner. Similary for two addresses. In simple search each record will show up only once. 
+<p>
+Which search to use? To answer this question consider the following;
+<li> if looking for a record with a known id then use the simple search. 
+<li> if looking for records between two periods, use simple search too.
+<li> if looking permits associated with certain owner, agent, address, zone or any inputs that are not available in simple search then use the extensive search.
+<li> As a rule of thumb use simple search first, if you think this form will not give you the necessary fields to make your query then use the extensive search.
+<li> Simple search will work faster as the query is simpler.
+<li> You may get results in simple search that you may not get in extensive search.
+<p> In the search forms most of the text fields are case insensitive. The option of full match, start with, ends with or contains is also provided to increase the possibilities of matching operations. Such as street name, owner name, owner address and notes fields all carry this feature.
+</P>
+<p> <font color=red>Caution </font> Try not to use the search engine without any entries. If for any reason the "Browse" button without filling any field, this means the user is asking for all the records in the system. Since these count in a number of thousands, this may take long time to get the result or you may get partial results and the possibility of the browser being hang. In this case try to close your browser and restart again and try to avoid this situation in the futur. To overcome this problem, the user is adviced to enter a reasonble range of dates that cover no more than one year at a time such as 01/01/2000 to 01/01/2001 and so on. Fig. 15 is the simple search interface.
+</p>
+
+<!-- picture -->
+<center>
+<table><tr><td>
+<img src=http://plateau/images/rent/docs/simple_search.jpg>
+</td></tr>
+<tr><td><b>Fig. 15</b> Simple Search Form
+</td></tr></table>
+</center>
+
+<a name=addr>
+<h2>Check Address</h2>
+<p>
+A search engine for addresses. Has two main goals. To verify that certain address exists in the GIS master address. Second to check if certain address is already used in the rental system. If the rental system is used the corresponding permit ids will be listed in the matching table where the user can jump to the corresponding permit.
+<p>Search for street name is case insensitive and could be partial match whern used with the options of "start with", "ends with", or "contains" otherwise it is a complete match with "is" option.
+<p>When searching for an address use as little information as possible, such as street name. To narrow your search you can fill other fields such as street number and direction. See Fig. 16 for more details.
+</P>
+
+<!-- picture -->
+<center>
+<table><tr><td>
+<img src=http://plateau/images/rent/docs/checkaddr.jpg>
+</td></tr>
+<tr><td><b>Fig. 16</b> Check Address Form
+</td></tr></table>
+ </center>
+
+<a name=reports>
+<h2>Reports </h2>
+<p>
+This form provides a list of options to select from. The options inclue (see Fig. 17 below);
+<li> List of addresses in the rental system. 
+<li> List of invalid addresses.
+<li> Pulled Dates. List of permits with pulled dates and reasons arranged in
+     date, pulled reason order order.
+<li> Pulled Dates with reasons. For certain reason the user will get all the
+     permits within the date range of pull-date. If no reason is selected, the 
+     list will include all reasons for that period. The order is in reason, 
+     date order this time. The user can alwarys reorder the list according 
+     to the sort category needed.
+<li> List of agents in the system. Prefered to be combined with certain date
+     range.
+<li> List of owners in the system. Prefered to be combined with certain date
+     range.
+<li> New Cycle, actaully it means the list of new permits for this year.
+<li> Year inspections. List of inspections dates.
+<li> Year inspection types. List of inspections dates with their types.
+<li> Overdue bills. Show all the permits that have been issued a bill more 
+     than one month from now but have not been paid yet.
+<li> Properties managed by agent. List of all properties managed by certain
+     agent (if the agent is selected from the list) otherwise the list will
+     be all the properties managed by agents. Date fields can be ignored.
+<li> Properties managed by an owner. The owner id must be entered. Date 
+     fields should be ignored here as well.
+<p> Dates fields should be used where it makes sense to be combined with. Such 
+    the list addressed could be combined with registered address. The option
+    of permits with pull dates when checked the system will automatically
+    mark the Pull date as the selected date type. Certain options, such as
+    Overdue bills need not combined with any date since it does not make
+    any sense to do so. Similary you do not to set dates for the options
+    "Property managed by Owner" or Properties managed by agent".
+</p>
+
+<!-- picture -->
+<center>
+<table><tr><td>
+<img src=http://plateau/images/rent/docs/reports.jpg>
+</td></tr>
+<tr><td><b>Fig. 17</b> Reports Menu Options
+</td></tr></table>
+ </center>
+
+
+<a name=statrep>
+<h2> Statistics Reports </h2>
+<!----            -------->
+<p>
+Provides a user menu of different kinds of statistics that can be collected
+from the system. For any certain period (week, month, range) these include;
+<li> Count of Permits: Registered, issued, expired, billed, received, pulled, inspected. 
+<li> Count of Inspections per Inspector
+<li> Count of Permits per Agent 
+<li> Count of Permits per Owner 
+<li> Count of Permits per Pull Reason 
+<p> The default period is a week from today, can be changed to one month from 
+    today or any specified range desired. See Fig. 18.
+</p>
+
+<!-- picture -->
+<center>
+<table><tr><td>
+<img src=http://plateau/images/rent/docs/stat.jpg>
+</td></tr>
+<tr><td><b>Fig. 18</b> The Statistics Report Options.
+</td></tr></table>
+</center>
+
+<a name=logout>
+<h2>  Logout </h2>
+<!---          -->
+<p>
+It is important for each user to logout from the system when he/she is done. This operation will release the resources used by the login session. In addition it will protect the data from being tempered with by curious users. The logout option is available on the left panel and also in most of the right frames in the bottom part of the page.
+</P>
+
+
+<a name=priv>
+<h2> Privileges </h2>
+<!---            ---->
+<p>
+	Since this system will be used by different departments in the City at the same time, the need to manage this system is essential for its success. The following was considered in the design of this package;
+<li>
+ All the departments except HAND are allowed to use the system to extract information that help the daily acitivities but are not allowed to do update or deletes. The authorized users in HAND department are the only authorized to do updates,inserts and deletes on this system according to the privileges granted to the users.
+
+</p>
+
+<a name=help>
+<h2> Help </h2>
+<!---     ---->
+<p>
+This documentation.
+                                             
+For more help call the ITS helpdesk or go online to
+ <a href=http://helpdesk>HelpDesk </a> to report any problem.
+
+<br>
+<br>
+
+</body>
+</html>

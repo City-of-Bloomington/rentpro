@@ -1,0 +1,561 @@
+package rental.web;
+
+import java.util.*;
+import java.sql.*;
+import java.io.*;
+import javax.servlet.*;
+import javax.servlet.http.*;
+import javax.sql.*;
+import java.net.URL;
+import java.io.FileOutputStream;
+import java.io.IOException;
+// 
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.Barcode;
+import com.itextpdf.text.pdf.PdfContentByte;
+import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.Chunk;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.FontFactory;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.pdf.PdfPage;
+import com.itextpdf.text.pdf.PdfName;
+import com.itextpdf.text.Font;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import rental.list.*;
+import rental.model.*;
+import rental.utils.*;
+
+
+public class PostCardPdf extends TopServlet{
+
+    //
+    String url="", imageUrl="", filename="post_card.pdf";
+    boolean debug = false;
+    static final long serialVersionUID = 63L;
+    static final String fontName2 ="Times-Roman";
+    static final String fontName ="Verdana";	
+    static Logger logger = LogManager.getLogger(PostCardPdf.class);
+    /**
+     * Generates the login form for all users.
+     *
+     * @param req the request 
+     * @param res the response
+     */
+    public void doPost(HttpServletRequest req, 
+		       HttpServletResponse res) 
+	throws ServletException, IOException {
+	String message="";
+
+	HttpSession session = null;
+	String name= "", startDate="", endDate="", cardDate="";
+	String value = "";
+	String [] vals;
+	Enumeration<String> values = req.getParameterNames();		
+	while (values.hasMoreElements()){
+	    name = values.nextElement().trim();
+	    vals = req.getParameterValues(name);
+	    value = vals[vals.length-1].trim();	
+	    if (name.equals("startDate")){
+		startDate = value;
+	    }
+	    else if (name.equals("endDate")){
+		endDate = value;
+	    }
+	    else if (name.equals("cardDate")){
+		cardDate = value;
+	    }
+	}				
+	OwnerList owners = new OwnerList(debug);
+	owners.setStartDate(startDate);
+	owners.setEndDate(endDate);
+	owners.setSoonToExpire();
+	owners.setOwnersOnly();
+	String back = owners.lookFor();
+	if(!back.equals("")){
+	    message += back;
+	}
+	OwnerList agents = new OwnerList(debug);
+	if(message.equals("")){
+	    agents.setStartDate(startDate);
+	    agents.setEndDate(endDate);
+	    agents.setSoonToExpire();
+	    agents.setAgentsOnly();
+	    back = agents.lookFor();
+	    if(!back.equals("")){
+		message += back;
+	    }
+	}
+	//
+	// adding agents to the list of owners (if any);
+	//
+	if(message.equals("")){
+	    if(agents.size() > 0){
+		for(Owner one:agents){
+		    if(!owners.contains(one)){
+			owners.add(one);
+		    }
+		}
+	    }
+	}
+	if(message.equals("") && owners.size() == 0){
+	    message += "No match found";
+	}
+	if(!message.equals("")){
+	    res.setContentType("text/html");
+	    PrintWriter out = res.getWriter();
+	    out.println("<head><title></title><body>");
+	    out.println("<p><font color=red>");
+	    out.println(message);
+	    out.println("</p>");
+	    out.println("</body>");
+	    out.println("</html>");
+	    out.flush();
+	    return;
+	}
+				
+	generate(res, owners, startDate, endDate, cardDate);
+			
+    }
+    void generate(HttpServletResponse res,
+		  List<Owner> owners,
+		  String startDate, String endDate, String cardDate
+		  ){
+	ServletOutputStream out = null;
+	if(owners == null || owners.size() == 0){
+	    return;
+	}
+	try{
+	    //Rectangle pageSize = new Rectangle(612, 792); // 8.5" X 11"
+	    // landscape mode
+	    Rectangle pageSize = new Rectangle(792, 612);
+	    // left right top bottom
+	    Document document = new Document(pageSize, 8, 8, 8, 8);// 1/4 inch
+	    // document.setPageSize(PageSize.LETTER.rotate());
+	    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+	    PdfWriter writer = PdfWriter.getInstance(document, baos);
+	    writer.setPageEvent(new RotateEvent());
+	    // writer.addPageDictEntry(PdfName.ROTATE, PdfPage.SEASCAPE);
+	    // writer.addPageDictEntry(PdfName.ROTATE, PdfPage.LANDSCAPE);
+	    document.open();
+	    //
+	    int page = 1;
+						
+	    List<Owner> list = new ArrayList<Owner>(4);
+	    int jj = 0;
+	    while(owners.size() - jj > 0){
+		for(int k=jj;k<jj+4;k++){
+		    if(owners.size() > k){
+			list.add(owners.get(k));
+		    }
+		}
+		// writer.setPageEvent(new RotateEvent());								
+		write_front(document, writer, list, startDate, endDate, cardDate);
+		document.newPage();											
+		write_back(document, writer, list, startDate, endDate, cardDate);
+		jj=jj+4;
+		list = new ArrayList<Owner>(4);
+		if(owners.size() - jj > 0){
+		    document.newPage();
+		}
+	    }
+	    //
+	    document.close();
+	    writer.close();
+	    res.setHeader("Expires", "0");
+	    res.setHeader("Cache-Control", 
+			  "must-revalidate, post-check=0, pre-check=0");
+	    res.setHeader("Pragma", "public");
+	    //
+	    // setting the content type
+	    filename = "postcard_"+Helper.getToday()+".pdf";
+	    res.setHeader("Content-Disposition"," attachment; filename="+filename);			
+	    res.setContentType("application/pdf");
+	    //
+	    // the contentlength is needed for MSIE!!!
+	    res.setContentLength(baos.size());
+	    //
+	    out = res.getOutputStream();
+	    if(out != null){
+		baos.writeTo(out);
+	    }			
+	}catch(Exception ex){
+	    System.err.println(ex);
+	}		
+    }
+    /**
+
+       HAND
+       City of Bloomington, Indiana
+       401 North Morton Street, Suite 130
+       Post Office Box 100
+       Bloomington, IN 47402
+
+
+       OneName
+       OneAddress
+       OneCSZ
+
+
+			 
+    */
+    void write_back(Document document, 
+		    PdfWriter writer,
+		    List<Owner> list,
+		    String startDate,
+		    String endDate,
+		    String cardDate){
+	Font fnts = FontFactory.getFont(fontName, 8); // small
+	Font fnt = FontFactory.getFont(fontName, 12);				
+	Font fntb = FontFactory.getFont(fontName, 12, Font.BOLD);
+	Font fnt2 = FontFactory.getFont(fontName, 14);	
+	Font fntb2 = FontFactory.getFont(fontName, 14, Font.BOLD);			
+	try{
+	    PdfContentByte cb = writer.getDirectContent();
+	    float[] widths = {50f, 50f}; // percentages
+	    float[] widths2 = {100f};
+	    Phrase phrase = null;
+	    Paragraph pp = null;
+	    PdfPCell cell = null;
+	    Phrase hand_phrase = null;
+	    Chunk ch = new Chunk("\n\n\n\nHAND\nCity of Bloomington, Indiana\n401 North Morton Street, Suite 130\nPost Office Box 100\nBloomington, IN 47402\n\n\n\n", fnt);
+						
+	    hand_phrase = new Phrase(ch);			
+	    PdfPTable table = new PdfPTable(widths);
+	    table.setWidthPercentage(100);
+	    table.setSpacingAfter(0f);
+	    table.setSpacingBefore(0f);
+	    table.getDefaultCell().setBorder(Rectangle.NO_BORDER);
+	    table.getDefaultCell().setHorizontalAlignment(Element.ALIGN_LEFT);
+	    if(list.size()  == 4){
+		int kk[] = {2,3,0,1};
+		for(int jj=0;jj<4;jj++){
+		    Owner one = list.get(kk[jj]);
+		    write_back_cell(one, table, kk[jj]+1);
+		}
+	    }
+	    else if(list.size() == 3){
+		int kk[] = {2,0,1};
+		Owner one = list.get(2);								
+		write_back_cell(one, table, 3);								
+		add_empty_cell(table);
+		one = list.get(0);												
+		write_back_cell(one, table, 1);
+		one = list.get(1);												
+		write_back_cell(one, table, 2);
+	    }
+	    else if(list.size() == 2){
+		add_empty_cell(table);
+		add_empty_cell(table);
+		int kk[] = {0,1};
+		for(int jj=0;jj<2;jj++){
+		    Owner one = list.get(kk[jj]);
+		    write_back_cell(one, table, kk[jj]+1);
+		}
+	    }
+	    else if(list.size() == 1){
+		add_empty_cell(table);
+		add_empty_cell(table);								
+		Owner one = list.get(0);
+		write_back_cell(one, table, 1);
+		add_empty_cell(table);			
+	    }						
+	    document.add(table);
+	}catch(Exception ex){
+	    System.err.println(ex);
+	}	
+			
+    }
+    void add_empty_cell(PdfPTable table){
+	Font fnt = FontFactory.getFont(fontName, 12);				
+	try{
+	    Phrase phrase = null;
+	    PdfPCell cell = null;
+	    Phrase empty_phrase = null;
+	    empty_phrase = new Phrase(new Chunk("  \n\n\n\n\n\n\n"+
+						"\n\n\n\n\n\n\n\n\n"+
+						"\n\n\n\n\n\n\n",fnt));
+	    cell = new PdfPCell(empty_phrase);
+	    cell.setBorder(Rectangle.NO_BORDER);
+	    cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+	    cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+	    table.addCell(cell);
+	}catch(Exception ex){
+	    System.err.println(ex);
+	}							
+
+    }
+
+													
+    void write_back_cell(Owner one, PdfPTable table, int kk){
+	Font fnts = FontFactory.getFont(fontName, 8); // small
+	Font fnt = FontFactory.getFont(fontName, 12);				
+	Font fntb = FontFactory.getFont(fontName, 12, Font.BOLD);
+	Font fnt2 = FontFactory.getFont(fontName, 14);	
+	Font fntb2 = FontFactory.getFont(fontName, 14, Font.BOLD);			
+	float[] widths = {50f, 50f}; // percentages
+	float[] widths2 = {100f};
+	Phrase phrase = null;
+	Paragraph pp = null;
+	PdfPCell cell = null;
+	Phrase hand_phrase = null;
+	Phrase empty_phrase = null;
+						
+	Chunk ch = new Chunk("\n\n\n\nHAND\nCity of Bloomington, Indiana\n401 North Morton Street, Suite 130\nPost Office Box 100\nBloomington, IN 47402\n\n\n\n", fnt);
+	try{						
+	    hand_phrase = new Phrase(ch);			
+	    PdfPTable subtable = new PdfPTable(widths2);								
+	    cell = new PdfPCell(hand_phrase);
+	    cell.setBorder(Rectangle.NO_BORDER);
+	    cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+	    cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+	    cell.setPadding(8);
+	    subtable.addCell(cell);
+	    cell = new PdfPCell();
+	    cell.setBorder(Rectangle.NO_BORDER);
+	    cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+	    cell.setVerticalAlignment(Element.ALIGN_MIDDLE);								
+	    pp = new Paragraph();
+	    pp.setIndentationLeft(45);
+	    pp.setSpacingAfter(50);
+	    pp.setSpacingBefore(50);						
+	    ch = new Chunk(one.getFullName()+"\n"+one.getAddress()+"\n"+one.getCityStateZip()+"\n\n",fnt);
+	    pp.add(ch);
+	    cell.addElement(pp);
+	    subtable.addCell(cell);
+	    table.addCell(subtable);
+	}catch(Exception ex){
+	    System.err.println(ex);
+	}	
+    }
+		
+    /**
+			 
+       OneCDate
+
+       Dear Onwer
+
+       Our records indicate that the Rental Occupancy Permits for the rental property(s) listed below will expire on the listed date.
+
+       address1          addressX1
+       address2          addressX2
+       address3          addressX3
+       address4          addressX4
+       other
+
+       Please contact this office at (812) 349-3420 to schedule an inspection to renew your permit. City Ordinance requires rental units have valid Rental Occupancy Permits.  Schedule your inspection in advance so all repairs and subsequent reinspections occur prior to the expiration of your current permit. 
+
+       THANK YOU,
+                     
+       Housing and Neighborhood Development
+
+    */
+    void write_front(Document document, 
+		     PdfWriter writer,
+		     List<Owner> list,
+		     String startDate,
+		     String endDate,
+		     String cardDate){
+
+	Font fnts = FontFactory.getFont(fontName, 8); // small
+	Font fnt = FontFactory.getFont(fontName, 10);				
+	Font fntb = FontFactory.getFont(fontName, 12, Font.BOLD);
+	Font fnt2 = FontFactory.getFont(fontName, 14);	
+	Font fntb2 = FontFactory.getFont(fontName, 14, Font.BOLD);
+				
+	Phrase phrase = null;
+	Paragraph pp = null;
+	PdfPCell cell = null;
+	PdfPCell addr_cell = null;
+	PdfPTable addr_table = null;
+	PdfPTable table = null;
+	try{
+	    PdfContentByte cb = writer.getDirectContent();
+	    float[] widths = {50f, 50f}; // percentages
+	    float[] widths2 = {100f};
+	    table = new PdfPTable(widths);
+	    table.setWidthPercentage(100);
+	    table.setSpacingAfter(0f);
+	    table.setSpacingBefore(0f);
+	    table.getDefaultCell().setBorder(Rectangle.NO_BORDER);
+	    table.getDefaultCell().setHorizontalAlignment(Element.ALIGN_LEFT);
+	    int kk=1;
+	    for(Owner one:list){
+		PdfPTable subtable = new PdfPTable(widths2);
+		subtable.setWidthPercentage(100);
+		subtable.setSpacingAfter(0f);
+		subtable.setSpacingBefore(0f);
+		subtable.getDefaultCell().setBorder(Rectangle.NO_BORDER);
+		subtable.getDefaultCell().setHorizontalAlignment(Element.ALIGN_LEFT);								
+		one.setSoonToExpire(startDate, endDate);
+		one.findSoonToExpireRents(true); // owners
+		List<Rent> rents = one.getRents();
+		String[] permit_expires = {" "," "," "," "};
+		String[] addressStr = {" "," "," "," "};
+		if(rents != null && rents.size() > 0){
+		    int jj=0;
+		    for(Rent rent:rents){
+			List<Address> addresses = rent.getAddresses();
+			if(addresses != null && addresses.size() > 0){
+			    if(jj < 3){
+				permit_expires[jj] = rent.getPermit_expires();
+				addressStr[jj] = addresses.get(0).getAddress();
+			    }
+			    else{
+				addressStr[jj] = "Other";
+			    }
+			}
+			jj++;
+			if(jj > 3) break;
+		    }
+		}
+		Chunk ch = new Chunk("\n\n\n"+cardDate+"\n\nDear Owner Manager\n\n",fnts);
+		phrase = new Phrase(ch);			
+		kk++;
+		cell = new PdfPCell(phrase);
+		cell.setBorder(Rectangle.NO_BORDER);
+		cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+		cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+		cell.setPaddingLeft(16);
+		subtable.addCell(cell);
+								
+		pp = new Paragraph();
+		pp.setIndentationLeft(16);
+		// pp.setSpacingAfter(50);
+		// pp.setSpacingBefore(50);						
+		ch = new Chunk("Our records indicate that the Rental Occupancy Permits for the rental property(s) listed below will expire on the listed date.\n",fnts);
+		pp.add(ch);
+								
+		cell = new PdfPCell();
+		cell.setBorder(Rectangle.NO_BORDER);
+		cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+		cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+		cell.setPadding(4);								
+		cell.addElement(pp);
+		subtable.addCell(cell);
+		addr_table = new PdfPTable(widths);
+		addr_table.setWidthPercentage(100);
+		addr_table.setSpacingAfter(0f);
+		addr_table.setSpacingBefore(0f);
+		addr_table.getDefaultCell().setBorder(Rectangle.NO_BORDER);
+		addr_table.getDefaultCell().setHorizontalAlignment(Element.ALIGN_LEFT);																
+		for(int ii=0;ii<4;ii++){ // 4 addresses max, if more add other
+		    //
+		    // address
+		    addr_cell = new PdfPCell(new Phrase(addressStr[ii],fnts));
+		    addr_cell.setBorder(Rectangle.NO_BORDER);
+		    addr_cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+		    addr_cell.setPaddingLeft(16);
+		    // addr_cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+		    addr_table.addCell(addr_cell);
+		    // expire
+		    //
+		    addr_cell = new PdfPCell(new Phrase(permit_expires[ii],fnts));
+		    addr_cell.setBorder(Rectangle.NO_BORDER);
+		    addr_cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+		    // addr_cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+		    addr_table.addCell(addr_cell);										
+										
+		}
+		cell = new PdfPCell();
+		cell.setBorder(Rectangle.NO_BORDER);
+		cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+		cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+		cell.setPadding(6);
+		cell.addElement(addr_table);
+		subtable.addCell(cell);
+		// cell.addElement(addr_table);
+		cell = new PdfPCell();
+		cell.setBorder(Rectangle.NO_BORDER);
+		cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+		cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+		cell.setPadding(4);
+		ch = new Chunk("Please contact this office at (812) 349-3420 to schedule an inspection to renew your permit. City Ordinance requires rental units have valid Rental Occupancy Permits.  Schedule your inspection in advance so all repairs and subsequent reinspections occur prior to the expiration of your current permit.\n\n Thank You\n\nHousing and Neighborhood Development\n\n",fnts);
+		pp = new Paragraph(ch);
+		pp.setIndentationLeft(16);
+		cell.addElement(pp);
+		subtable.addCell(cell);
+		table.addCell(subtable);
+	    }
+	    if(list.size() < 4){
+		for(int j=list.size()-1;j<4;j++){
+		    phrase = new Phrase(new Chunk(" ",fnt));
+		    cell = new PdfPCell(phrase);
+		    cell.setBorder(Rectangle.NO_BORDER);
+		    cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+		    cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+		    table.addCell(cell);
+		}
+	    }						
+	    document.add(table);
+	}catch(Exception ex){
+	    System.err.println(ex);
+	}	
+			
+    }		
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

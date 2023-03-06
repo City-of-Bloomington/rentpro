@@ -1,0 +1,21 @@
+<style>
+#div_top {
+    display: flex;
+    background-color:#eeeeee;
+    list-style:none;
+    list-style-type:none;
+    padding-left: 0em;
+    align-items: center;
+    justify-content:center;
+    
+}
+#ul_top li{
+    display: inline-block;
+    float:center;
+    background-color:lightblue;
+    color:black;
+    padding:0.1em;
+    margin:0.2em;
+}
+</style>
+
