@@ -15,6 +15,7 @@ public class LegalList extends ArrayList<Legal>{
     final static long serialVersionUID = 540L;
     String id="",reason="",startBy="",status="", rental_id="";
     String dateFrom="",dateTo="", whichDate="", attention="", case_id="";
+    String sortby="";
     //  List<Legal> legals = null;
     List<String> starters = null;
     Logger logger = LogManager.getLogger(LegalList.class);
@@ -70,6 +71,9 @@ public class LegalList extends ArrayList<Legal>{
     }
     public void setWhichDate(String val){
 	whichDate = val;
+    }
+    public void setSortbyLast(){
+	sortby = " order by l.id desc "; 
     }
     //
     // getters
@@ -143,6 +147,9 @@ public class LegalList extends ArrayList<Legal>{
 	}
 	if(!where.equals("")){
 	    qq += " where "+where;
+	}
+	if(!sortby.equals("")){
+	    qq += sortby;
 	}
 	if(debug){
 	    logger.debug(qq);

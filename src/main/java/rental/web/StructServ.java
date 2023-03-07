@@ -238,6 +238,7 @@ public class StructServ extends TopServlet{
 		out.println("<td id="+st.getId()+">");
 		out.println(st.getIdentifier()+"</td>");
 		if(user.canEdit() || user.isInspector()){
+		    /**
 		    out.println("<td><input type=button value=\"Edit\" "+
 				"onclick=\"window.open('"+url+"EditStructure?"+
 				"&action=zoom&id="+st.getId()+"','Structures',"+
@@ -245,6 +246,7 @@ public class StructServ extends TopServlet{
 				"directories=0,status=0,menubar=1,"+
 				"scrollbars=1,top=100,left=100,"+
 				"resizable=1,width=450,height=300');\"></td>");
+		    */
 		}
 		out.println("</tr>");
 		jj++;

@@ -462,15 +462,17 @@ public class InspectFileServ extends TopServlet{
 	    out.println("</table>");
 	    out.println("<tr><td><table width=\"90%\">");
 	    out.println("<tr><td align=\"right\">");
-	    out.println("<input type=\"submit\" name=\"action\" value=\"Update\" />");
+	    // out.println("<input type=\"submit\" name=\"action\" value=\"Update\" />");
 	    out.println("<td valign=\"top\" align=\"center\">");
+	    /**
 	    out.println("<input type=\"button\" name=\"action\" "+
 			"onclick=\"document.location='"+url+
 			"RentalFileServ?rental_id="+rental_id+"'\" "+
 			"value=\"Add Attachment\" />&nbsp;&nbsp;");
+	    */
 	    out.println("</td>");			
-	    out.println("<td align=\"right\">");
-	    out.println("<button onclick=\"window.location='"+url+"InspectionServ?rental_id="+rental_id+"';return false;\">New Inspection</button></td>");
+	    // out.println("<td align=\"right\">");
+	    // out.println("<button onclick=\"window.location='"+url+"InspectionServ?rental_id="+rental_id+"';return false;\">New Inspection</button></td>");
 	    out.println("</tr>");			
 	    out.println("</table></td></tr>");
 	    out.println("</table><br />");

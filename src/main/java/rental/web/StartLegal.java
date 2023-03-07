@@ -130,6 +130,7 @@ public class StartLegal extends TopServlet{
 	List<Defendant> defendants = null;
 	LegalList legals = new LegalList(debug, rental_id);
 	legals.setStatus("both"); // New or Pending
+	legals.setSortbyLast();
 	message = legals.lookFor();
 	System.err.println(" action "+action+" id "+id);
 	//
@@ -281,7 +282,7 @@ public class StartLegal extends TopServlet{
 	    return;
 			
 	}
-	out.println("<html><head><title>Rentals Start Legal</title>");
+	out.println("<html><head><title>Rental Start Legal</title>");
 	Helper.writeWebCss(out, url);
 	out.println("<script language=Javascript>");
 	out.println("  function validateDelete(){	                      ");
@@ -361,7 +362,7 @@ public class StartLegal extends TopServlet{
 	    out.println(legal.getPull_reason());
 	    out.println("</td></tr>");						
 	    out.println("</table></td></tr>");
-	    if(action.equals("zoom") && user.hasRole("Edit")){
+	    if(action.equals("zoom") && user.canEdit()){
 		out.println("<tr><td align=right>");
 		out.println("<input type=\"submit\" name=\"action\" value=\"Edit\" />");
 		out.println("</td></tr>");

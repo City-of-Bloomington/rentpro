@@ -11,7 +11,7 @@ import rental.list.*;
 import rental.model.*;
 import rental.utils.*;
 
-@WebServlet(urlPatterns = {"/LegalAddOner"})
+@WebServlet(urlPatterns = {"/LegalAddOwner"})
 public class LegalAddOwner extends TopServlet{
 
     final static long serialVersionUID = 510L;
@@ -303,9 +303,8 @@ public class LegalAddOwner extends TopServlet{
 	    else
 		out.println("<h3><font color='red'>"+message+"</font></h3>");
 	}
-	if(action.equals("")){
-	    if(user.hasRole("Edit"))
-		out.println("<form name='myForm' method='post'>");
+	if(action.equals("") && user.canEdit()){
+	    out.println("<form name='myForm' method='post'>");
 	    out.println("<table width=80% border><tr><td>");
 	    out.println("<table width=100%>");
 	    out.println("<tr><td>Rental ID: "+legal.getRental_id());

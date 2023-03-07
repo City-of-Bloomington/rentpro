@@ -1343,6 +1343,7 @@ public class Rental extends TopServlet{
 		//
 		// Update 
 		out.println("<tr>");
+		/**
 		out.println("<td valign=\"top\" "+
 			    "align=\"center\"><font color=\"green\">"+
 			    "If you've made any changes click on &gt;&gt;"+
@@ -1355,7 +1356,9 @@ public class Rental extends TopServlet{
 		    out.println("<input type=\"button\" name=\"action\" "+
 				"onclick=\"validateDelete();\" value=\"Delete\" />");
 		}
-		out.println("</td></tr>");
+		out.println("</td>");
+		*/
+		out.println("</tr>");
 		out.println("</table></td></tr>");
 	    }
 	    // Second row
@@ -1372,14 +1375,13 @@ public class Rental extends TopServlet{
 			    "id="+id+"'\" "+
 			    "value=\"Add Owner/Agent\" />&nbsp;&nbsp;");
 		out.println("</td>");
-		*/
+
 		out.println("<td valign=\"top\">");
 		out.println("<input type=\"button\" name=\"action\" "+
 			    "onClick=\"document.location='"+url+
 			    "StructServ?rid="+id+"'\" "+
 			    "value=\"Structures/Units\" />&nbsp;&nbsp;");
 		out.println("</td>");
-		/**
 		out.println("<td valign=\"top\">");
 		out.println("<input type=\"button\" name=\"action\" "+
 			    "onclick=\"document.location='"+url+
@@ -1393,6 +1395,7 @@ public class Rental extends TopServlet{
 	    // Inspection
 	    if(user.isInspector() ||
 	       user.canEdit()){
+		/**
 		out.println("<td valign=\"top\" align=\"right\">");
 		if(oldUnitFormat){
 		    out.println("<input type=\"button\" name=\"action\" onclick=\"");
@@ -1405,6 +1408,13 @@ public class Rental extends TopServlet{
 			      " value=\"Inspections\">&nbsp;&nbsp;</td>");
 		}
 		out.println("</td>");
+		*/
+		out.println("<td valign=top>");
+		out.println("<input type=\"button\" name=\"action\" "+
+			    "onclick=\"document.location='"+url+
+			    "StartLegal?rental_id="+id+"'\" "+
+			    "value=\"Start Legal\" />");
+		out.println("</td>");		
 		/**
 		out.println("<td valign=\"top\" align=\"right\">");
 		out.println("<input type=\"button\" name=\"action\" onclick=\""+
@@ -1514,14 +1524,7 @@ public class Rental extends TopServlet{
 		*/
 	    }
 	    if(user.canEdit()){
-		/**
-		out.println("<td valign=top>");
-		out.println("<input type=\"button\" name=\"action\" "+
-			    "onclick=\"document.location='"+url+
-			    "StartLegal?rental_id="+id+"'\" "+
-			    "value=\"Start Legal\" />");
-		out.println("</td>");
-		*/
+
 	    }
 	    out.println("</tr>");				
 	}
