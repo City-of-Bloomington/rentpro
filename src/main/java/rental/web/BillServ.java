@@ -880,7 +880,6 @@ public class BillServ extends TopServlet{
 	//
 	// submit
 	if(user.canEdit()){
-	    /**
 	    if(bid.equals("")){
 		out.println("<tr><td><table width=\"100%\"><tr>");
 		out.println("<td align=\"right\" "+
@@ -911,8 +910,7 @@ public class BillServ extends TopServlet{
 		    out.println("</td></tr>");
 		}
 		out.println("</table>");
-		}		
-	    */
+	    }		
 	}
 	out.println("</form>");
 	//

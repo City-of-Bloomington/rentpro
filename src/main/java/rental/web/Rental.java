@@ -1409,12 +1409,26 @@ public class Rental extends TopServlet{
 		}
 		out.println("</td>");
 		*/
+		// Start legal
 		out.println("<td valign=top>");
 		out.println("<input type=\"button\" name=\"action\" "+
 			    "onclick=\"document.location='"+url+
 			    "StartLegal?rental_id="+id+"'\" "+
 			    "value=\"Start Legal\" />");
-		out.println("</td>");		
+		out.println("</td>");
+		//
+		// bill
+		out.println("<td valign=top>");
+		out.println("<input type=\"button\" name=\"action\" onclick=\""+
+			    "window.open('"+url+"BillServ?"+
+			    "id="+id+"','Bill',"+
+			    "'toolbar=0,location=0,"+
+			    "directories=0,status=0,menubar=1,"+
+			    "scrollbars=1,top=100,left=100,"+
+			    "resizable=1,width=700,height=600');\""+
+			    " value=\"Bill\">&nbsp;");
+		out.println("</td>");
+
 		/**
 		out.println("<td valign=\"top\" align=\"right\">");
 		out.println("<input type=\"button\" name=\"action\" onclick=\""+
@@ -1428,20 +1442,6 @@ public class Rental extends TopServlet{
 		*/
 	    }
 	    if(user.canEdit()){
-		out.println("<td valign=top>");
-		//
-		// bill
-		/**
-		out.println("<input type=\"button\" name=\"action\" onclick=\""+
-			    "window.open('"+url+"BillServ?"+
-			    "id="+id+"','Bill',"+
-			    "'toolbar=0,location=0,"+
-			    "directories=0,status=0,menubar=1,"+
-			    "scrollbars=1,top=100,left=100,"+
-			    "resizable=1,width=700,height=600');\""+
-			    " value=\"Bill\">&nbsp;");
-		out.println("</td>");
-		*/
 		//
 		/**
 		out.println("<td valign=\"top\">");
