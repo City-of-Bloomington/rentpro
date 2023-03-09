@@ -16,7 +16,7 @@ public class MsgMail{
     static String msgText = "This is a message body.\nHere's the second line.";
     static String to = "";
     static String from = "";
-    static String host = "localhost";	
+    static String host = "smtp.bloomington.in.gov";	
     static boolean debug = true;
     static String subject = "Start Legal";
     static String _subject = "Start Legal";
