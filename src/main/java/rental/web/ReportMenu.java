@@ -661,7 +661,7 @@ public class ReportMenu extends TopServlet {
 		all = "\"ID\",\"Registered Date\",\"Expire Date\",\"Status\",\"Address\",\"Location ID\",\"Owner\",\"Owner Address\",\"Owner City\",\"Owner State\",\"Owner Zip\",\"Agent\",\"Agent Address\",\"Agent Email\",\"Agent Zip\",\"Buidings\",\"Units\",\"Bedrooms\",\"Efficiency\",\"Occupants\"";
 	    }			
 	    else if(report.equals("ownersInfo")){
-		all = "\"Owner Name\",\"Owner Address\",\"Rental Address\",\"Permit Expire Date\"";
+		all = "\"Owner Name\",\"Owner Address\",\"Owner City, State\",\"Phones\",\"Email\",\"Rental Address\",\"Permit Expire Date\"";
 	    }
 	    else if(report.equals("inspections")){
 		all = "\"Inspection ID\",\"Rental ID\",\"Address\",\"Building Type\",\"Inspection Date\",\"Inspection Type\",\"Compliance Date\",Violations\",\"Smoke Detectors\",\"Life Safety\",\"Inspection Duration (hrs)\",\"Inspected By\",\"Insp Time Status\"";
@@ -1748,6 +1748,8 @@ public class ReportMenu extends TopServlet {
 				    all += "\""+owner.getFullName()+"\",";
 				    all += "\""+owner.getAddress()+"\",";
 				    all += "\""+owner.getCityStateZip()+"\",";
+				    all += "\""+owner.getPhones()+"\",";
+				    all += "\""+owner.getEmail()+"\",";
 				    all += "\""+addr.getAddress()+"\",";
 				    all += "\""+rent.getPermit_expires()+"\"\n";
 				}
@@ -1759,6 +1761,8 @@ public class ReportMenu extends TopServlet {
 				    all += "<tr><td>"+owner.getFullName()+"</td>";
 				    all += "<td>"+owner.getAddress()+"</td>";
 				    all += "<td>"+owner.getCityStateZip()+"</td>";
+    				    all += "<td>"+owner.getPhones()+"</td>";
+				    all += "<td>"+owner.getEmail()+"</td>";
 				    all += "<td>"+addr.getAddress()+"</td>";
 				    all += "<td>"+rent.getPermit_expires()+"</td>";
 				    all += "</tr>\n";
