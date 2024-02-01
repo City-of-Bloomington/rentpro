@@ -40,7 +40,7 @@ public class Logout extends TopServlet{
 	if(session != null){
 	    session.invalidate();
 	}
-	res.sendRedirect(url);
+	res.sendRedirect(endpoint_logout_uri);
 	return;
     }
 

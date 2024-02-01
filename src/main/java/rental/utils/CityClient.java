@@ -74,7 +74,7 @@ public class CityClient {
 	    HttpPost httpPost = new HttpPost(uri);
 	    httpPost.setHeader("Content-Type","application/x-www-form-urlencoded");
 	    String nonce = UUID.randomUUID().toString();
-	    System.err.println(" nonce "+nonce);
+	    // System.err.println(" nonce "+nonce);
 	    List<NameValuePair> params = new ArrayList<NameValuePair>();
 	    params.add(new BasicNameValuePair("code", code));
 						
@@ -88,13 +88,13 @@ public class CityClient {
 	    CloseableHttpResponse response = client.execute(httpPost);
 	    // check if not 200				
 	    int resStatus = response.getStatusLine().getStatusCode();
-	    System.err.println(" res status "+resStatus);
+	    // System.err.println(" res status "+resStatus);
 	    String jsonString = EntityUtils.toString(response.getEntity());
-	    System.err.println("response json str "+jsonString);
+	    // System.err.println("response json str "+jsonString);
 	    JSONObject json = new JSONObject(jsonString);
 	    String access_token = json.getString("access_token");
 	    String id_token = json.getString("id_token");
-	    System.err.println(" id_token "+id_token);
+	    // System.err.println(" id_token "+id_token);
 
 	    client.close();
 	    String[] chunks = id_token.split("\\.");
@@ -108,11 +108,11 @@ public class CityClient {
 	    String header = new String(decoder.decode(header_chunk));
 	    String payload = new String(decoder.decode(payLoad_chunk));
 						
-	    System.err.println(" header "+header);
-	    System.err.println(" payload "+payload);
+	    // System.err.println(" header "+header);
+	    // System.err.println(" payload "+payload);
 	    JSONObject jjson = new JSONObject(payload);
 	    String username = jjson.getString(config.getUsername());
-	    System.err.println(" username "+username);
+	    // System.err.println(" username "+username);
 	    if(username != null && !username.isEmpty()){
 		user = getUser(username);
 	    }
@@ -158,7 +158,7 @@ public class CityClient {
     // convert client secret to SecretKey
     //
     private SecretKey convertStringToSecretKey(String encodedKey) {
-	System.err.println(" convert string to secret key");
+	// System.err.println(" convert string to secret key");
 	byte[] decodedKey = Base64.getUrlDecoder().decode(encodedKey);
 	SecretKey originalKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "HmacSHA256"); // AES, DES, HmacSHA256
 	return originalKey;
@@ -175,46 +175,11 @@ public class CityClient {
 	    mac.init(secretKey);
 	    byte[] digest = mac.doFinal(content_bytes);
 	    String digest_str = Base64.getUrlEncoder().encodeToString(digest);
-	    System.err.println(" sig "+signature);
-	    System.err.println(" sig2 "+digest_str);
+	    // System.err.println(" sig "+signature);
+	    // System.err.println(" sig2 "+digest_str);
 	    if(signature.equals(digest_str)){
 		return true;
 	    }
-	}catch(Exception ex){
-	    System.err.println(" verify "+ex);
-	}
-	return false;
-    }
-						
-    boolean verify3(String header_chunk, String payLoad_chunk,
-		    String signature, Configuration config){
-	try{
-	    String key = config.getClientSecret();
-	    // for keys with - or _
-	    byte [] key_bytes = Base64.getUrlDecoder().decode(key);
-	    // for others use the following
-	    // byte [] key_bytes = Base64.getDecoder().decode(key);
-	    //
-	    // X509EncodedKeySpec keySpec = new X509EncodedKeySpec(key_bytes);
-	    PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(key_bytes);
-	    KeyFactory kf = KeyFactory.getInstance("RSA");
-	    PrivateKey privKey = kf.generatePrivate(keySpec);
-	    // System.out.println(privKey);
-				
-	    String content = (header_chunk + "." + payLoad_chunk);
-
-	    Signature instance = Signature.getInstance("SHA256withRSA"); 
-	    instance.initSign(privKey);
-	    instance.update(content.getBytes("UTF-8"));
-	    byte[] s = instance.sign();
-	    String signature2 = Base64.getEncoder().encodeToString(s);
-	    System.err.println("sig 1 "+signature);
-	    System.err.println("sig 2 "+signature2);
-	    if(signature.equals(signature2)){
-		System.err.println(" not valid signature");
-		return true;
-	    }
-
 	}catch(Exception ex){
 	    System.err.println(" verify "+ex);
 	}

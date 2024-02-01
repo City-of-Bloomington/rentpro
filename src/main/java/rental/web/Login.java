@@ -11,8 +11,8 @@ import org.apache.logging.log4j.Logger;
 import rental.list.*;
 import rental.model.*;
 import rental.utils.*;
-
-@WebServlet(urlPatterns = {"/Login"})
+// change to /Login for CAS
+@WebServlet(urlPatterns = {"/CasLogin"})
 public class Login extends TopServlet{
     final static long serialVersionUID = 560L;
     static Logger logger = LogManager.getLogger(Login.class);

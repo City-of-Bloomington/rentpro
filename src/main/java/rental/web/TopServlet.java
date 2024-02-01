@@ -36,6 +36,7 @@ public class TopServlet extends HttpServlet {
     static Configuration config = null;
     static Logger logger = LogManager.getLogger(TopServlet.class);
     static ServletContext context = null;
+    static String endpoint_logout_uri = ""; 
     public void init(ServletConfig conf){
 	try{
 	    context = conf.getServletContext();
@@ -77,6 +78,9 @@ public class TopServlet extends HttpServlet {
 	    str = context.getInitParameter("cookieValue");
 	    if(str != null)
 		cookieValue = str;
+	    str  = context.getInitParameter("endpoint_logout_uri");
+	    if(str != null)
+		endpoint_logout_uri = str;
 	    String username = context.getInitParameter("adfs_username");
 	    String auth_end_point = context.getInitParameter("auth_end_point");
 	    String token_end_point = context.getInitParameter("token_end_point");

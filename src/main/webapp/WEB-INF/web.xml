@@ -9,6 +9,7 @@
     <display-name>RentPro</display-name>
     <description>
     </description>
+    <!--
     <filter>
       <filter-name>CAS Authentication Filter</filter-name>
       <filter-class>org.jasig.cas.client.authentication.AuthenticationFilter</filter-class>
@@ -21,11 +22,6 @@
       <filter-name>CAS HttpServletRequest Wrapper Filter</filter-name>
       <filter-class>org.jasig.cas.client.util.HttpServletRequestWrapperFilter</filter-class>
     </filter>
-    <!--
-      change this filter to /Login if you want to use CAS
-      or /CasLogin if you want to use ADFS
-      make sure to update Login.java and LoginServlet.java accordingly
-    -->     
   <filter-mapping>
     <filter-name>CAS Authentication Filter</filter-name>
       <url-pattern>/Login</url-pattern>
@@ -38,6 +34,7 @@
     <filter-name>CAS HttpServletRequest Wrapper Filter</filter-name>
     <url-pattern>/Login</url-pattern>
   </filter-mapping>
+  -->
   <session-config>
     <cookie-config>
       <http-only>true</http-only>        
