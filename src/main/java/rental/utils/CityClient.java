@@ -136,7 +136,7 @@ public class CityClient {
 	else{
 	    username2 = username;
 	}
-	System.err.println(username2);
+	// System.err.println(username2);
 	try{
 	    User user2 = new User(false, username2);
 	    String back = user2.doSelect();
@@ -170,7 +170,7 @@ public class CityClient {
 	    String key = config.getClientSecret();
 	    SecretKey secretKey = convertStringToSecretKey(key);
 	    String content = (header_chunk + "." + payLoad_chunk);
-	    System.err.println(" content "+content);
+	    // System.err.println(" content "+content);
 	    byte[] content_bytes = content.getBytes("UTF-8");
 	    mac.init(secretKey);
 	    byte[] digest = mac.doFinal(content_bytes);
